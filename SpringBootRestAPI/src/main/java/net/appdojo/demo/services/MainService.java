@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import net.appdojo.demo.dao.AccountDAO;
+import net.appdojo.demo.dao.CourseDAO;
 import net.appdojo.demo.dao.SessionDAO;
 import net.appdojo.demo.dao.TutorAvailabilityDAO;
 import net.appdojo.demo.models.Account;
+import net.appdojo.demo.models.Course;
 import net.appdojo.demo.models.Session;
 import net.appdojo.demo.models.TutorAvailability;
 import net.appdojo.demo.models.User;
@@ -18,6 +20,8 @@ public class MainService {
 	@Autowired
 	AccountDAO accountDAO;
 	SessionDAO sessionDAO;
+	CourseDAO courseDAO;
+	
 	TutorAvailabilityDAO tutorAvailabilityDAO;
 	
 	public User getUser(int id)
@@ -75,4 +79,19 @@ public class MainService {
 
 	}
 	
+	public List<TutorAvailability> addAvailability(TutorAvailability tAvailability) {
+		tutorAvailabilityDAO = new TutorAvailabilityDAO();
+		return tutorAvailabilityDAO.addAvailability(tAvailability);
+
+	}
+
+    public List<Course> getCourses() {
+        courseDAO = new CourseDAO();
+		return courseDAO.getCourses();
+
+    }
+
+    public List<Account> getSearchTutors(Integer courseId, String firstName, String lastName) {
+		return accountDAO.getSearchTutors(courseId, firstName, lastName);
+    }
 }

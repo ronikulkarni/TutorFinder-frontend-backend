@@ -1,5 +1,6 @@
 package net.appdojo.demo.dao;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,38 @@ public class TutorAvailabilityDAO extends Database{
 			return null;
 		}
 	}
+    public List<TutorAvailability> addAvailability(TutorAvailability tAvailability) {
+        try {
+			System.out.println("papoosi addavailability tutorid " + tAvailability.getTutorId());
+			System.out.println("papoosi addavailability tutorid " + tAvailability.getDayOfWeek());
+			System.out.println("papoosi addavailability tutorid " + tAvailability.getStartTime());
+			System.out.println("papoosi addavailability tutorid " + tAvailability.getEndTime());
+			
+            List<TutorAvailability> tAvailabilities = new ArrayList<TutorAvailability>();
+    		Database db = new Database();
+
+             // SQL INSERT query using PreparedStatement
+            String insertSQL = "INSERT INTO TutorAvailability (tutorid, dayofweek, starttime, endtime) VALUES (?, ?, ?, ?)";
+
+			// Insert values
+            int generatedId = db.execute(insertSQL, tAvailability.getTutorId(), tAvailability.getDayOfWeek(), tAvailability.getStartTime(), tAvailability.getEndTime());
+
+            // Check the result
+            if (generatedId != -1) {
+                System.out.println("Tutor Availability successfully with ID: " + generatedId);
+                tAvailabilities = getAvailability(tAvailability.getTutorId());
+            } else {
+                System.out.println("Insert failed.");
+            }
 
 
+        	return tAvailabilities;		
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} 
+        
+    }
 	
 }

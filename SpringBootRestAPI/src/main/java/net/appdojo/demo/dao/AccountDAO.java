@@ -229,4 +229,45 @@ public class AccountDAO extends Database{
 
 		}
 	}
+
+    public List<Account> getSearchTutors(Integer courseId, String firstName, String lastName) {
+		Database db = new Database();
+        try {
+			String query = "SELECT * FROM account where AccType = 'tutor' AND ";
+			if (courseId != null)
+				query = query + " FIND_IN_SET(" + courseId.intValue() + ", Course)";
+			else if (firstName != null)
+				query = query + " firstName LIKE '%" + firstName + "%'";
+			else if (lastName != null)
+			query = query + " lastName LIKE '%" + lastName + "%'";
+
+			ResultSet rs = db.query(query);
+			if (rs==null||!rs.next())
+        	{
+        		System.err.println ("Query failed");
+        		return null;
+        	}
+        	List<Account> accounts = new ArrayList<Account>();
+        	do {
+				Account acct = new Account();
+				acct.setAccountId(rs.getInt("AccountID"));
+				acct.setAccountType(rs.getString("AccType"));
+				acct.setCourse(rs.getString("Course"));
+				acct.setEmailId(rs.getString("EmailID"));
+				acct.setFailedAttempts(rs.getInt("FailedAttempts"));
+				acct.setFirstName(rs.getString("FirstName"));
+				acct.setLastName(rs.getString("lastName"));
+				acct.setLockTime(rs.getString("LockTime"));
+				acct.setMajor(rs.getInt("Major"));
+				acct.setPhoneNumber(rs.getString("PhoneNumber"));
+	        	accounts.add(acct);
+        	}while (rs.next());
+
+        	return accounts;		
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+    }
 }

@@ -132,7 +132,7 @@ public class Database {
 			if (sql.indexOf("?") < 0 && values!=null && values.length>0) {
 				sql=addQuestionMarks(sql,values.length);
 			}
-			PreparedStatement statement = conn.prepareStatement(sql);
+			PreparedStatement statement =prepare(sql,true);
 			int row = 1;
 			for (Object obj : values) {
 				statement.setObject(row++, obj);
@@ -144,7 +144,7 @@ public class Database {
 				return newId;
 			}
 		} catch (SQLException e) {
-
+			e.printStackTrace();
 		} finally {
 			close();
 		}

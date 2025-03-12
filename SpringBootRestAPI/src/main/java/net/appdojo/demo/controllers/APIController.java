@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.appdojo.demo.models.Account;
 import net.appdojo.demo.models.Session;
+import net.appdojo.demo.models.Course;
 import net.appdojo.demo.models.TutorAvailability;
 import net.appdojo.demo.models.User;
 import net.appdojo.demo.services.MainService;
@@ -104,9 +106,7 @@ public class APIController {
 			System.out.printf("2. post getTutorsForCourse: \n%s\n", tutorAccts);
 			return tutorAccts;
 		} catch (Exception ex) {
-			System.err.println("post auth error:" + ex);
-			account.setAccountId(-1);
-			
+			System.err.println("post auth error:" + ex);	
 			return tutorAccts;
 		}
 	}
@@ -122,10 +122,24 @@ public class APIController {
 			System.out.printf("2. post sessions: \n%s\n", sessions);
 			return sessions;
 		} catch (Exception ex) {
-			System.err.println("post auth error:" + ex);
-			account.setAccountId(-1);
-			
+			System.err.println("post auth error:" + ex);	
 			return sessions;
+		}
+	}
+
+
+	@GetMapping("/courses")
+	public List<Course> getCourses() {
+		List<Course> courses = new ArrayList<Course>();
+		try {
+			System.out.printf("1. courses ");
+			courses = service.getCourses();
+
+			System.out.printf("2. post courses: \n%s\n", courses);
+			return courses;
+		} catch (Exception ex) {
+			System.err.println("post auth error:" + ex);	
+			return courses;
 		}
 	}
 
@@ -140,20 +154,41 @@ public class APIController {
 			return tAvailabilities;
 		} catch (Exception ex) {
 			System.err.println("post auth error:" + ex);
-			account.setAccountId(-1);
-			
 			return tAvailabilities;
 		}
 	}
 
-	// Another syntax to implement a
-	// GET method
-	@GetMapping("/info")
-	public String info() {
-		String str2 = "<html><body><font color=\"green\">" + "<h2>GeeksForGeeks is a Computer"
-				+ " Science portal for Geeks. " + "This portal has been " + "created to provide well written, "
-				+ "well thought and well explained " + "solutions for selected questions."
-				+ "</h2></font></body></html>";
-		return str2;
+	@PostMapping("/addAvailability")
+	public List<TutorAvailability> addAvailability(@RequestBody TutorAvailability tAvailability) {
+		List<TutorAvailability> tAvailabilities = new ArrayList<TutorAvailability>();
+		try {
+			System.out.printf("1. Add availabilities \n%s\n", tAvailability);
+			tAvailabilities = service.addAvailability(tAvailability);
+
+			System.out.printf("2. post add availability: \n%s\n", tAvailabilities);
+			return tAvailabilities;
+		} catch (Exception ex) {
+			System.err.println("post auth error:" + ex);
+			return tAvailabilities;
+		}
+	}
+
+	@GetMapping("/searchtutors")
+	public List<Account> getSearchTutors(
+		@RequestParam(required = false) Integer courseId, 
+		@RequestParam(required = false) String firstName,  
+		@RequestParam(required = false) String lastName) 
+	{
+		List<Account> tutorAccts = new ArrayList<Account>();
+		try {
+			System.out.printf("1. getSearchTutors ");
+
+			tutorAccts = service.getSearchTutors(courseId, firstName, lastName);
+			System.out.printf("2. post getSearchTutors: \n%s\n", tutorAccts);
+			return tutorAccts;
+		} catch (Exception ex) {
+			System.err.println("post getSearchTutors error:" + ex);	
+			return tutorAccts;
+		}
 	}
 }
