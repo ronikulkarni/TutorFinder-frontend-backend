@@ -90,5 +90,34 @@ public class TutorAvailabilityDAO extends Database{
 		} 
         
     }
+
+    public List<TutorAvailability> deleteAvailability(Long availabilityId, Long tutorId) {
+        try {
+			System.out.println("papoosi addavailability tutorid " + availabilityId);
+		
+            List<TutorAvailability> tAvailabilities = new ArrayList<TutorAvailability>();
+    		Database db = new Database();
+
+             // SQL DELETE query using PreparedStatement
+            String deleteSQL = "DELETE FROM TutorAvailability WHERE AvailabilityID = " + availabilityId.intValue();
+
+			// Insert values
+            int result = db.execute(deleteSQL);
+
+            // Check the result
+            if (result != -1) {
+                System.out.println("Tutor Availability successfully deleted with ID: " + result);
+                tAvailabilities = getAvailability(tutorId.intValue());
+            } else {
+                System.out.println("Delete failed.");
+            }
+        	return tAvailabilities;		
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} 
+    }
+    
 	
 }

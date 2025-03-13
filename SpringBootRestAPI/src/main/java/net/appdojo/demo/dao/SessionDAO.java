@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import net.appdojo.demo.models.Account;
 import net.appdojo.demo.models.Session;
+import net.appdojo.demo.models.TutorAvailability;
 
 @Component
 public class SessionDAO extends Database{
@@ -45,6 +46,7 @@ public class SessionDAO extends Database{
         	do {
 
 				Session session = new Session();
+				session.setSessionId(rs.getInt("SessionID"));
 				session.setStudentId(rs.getInt("StudentID"));
 				session.setTutorId(rs.getInt("TutorID"));
 				session.setCourseId(rs.getInt("CourseID"));
@@ -69,6 +71,65 @@ public class SessionDAO extends Database{
 		}
 	}
 
+    public List<Session> addSession(Session session) {
+        try {
+			System.out.println("papoosi addavailability tutorid " + session.getTutorId());
+			System.out.println("papoosi addavailability tutorid " + session.getStudentId());
+			System.out.println("papoosi addavailability tutorid " + session.getCourseId());
+			System.out.println("papoosi addavailability tutorid " + session.getSessionDate());
+			
+            List<Session> sessions = new ArrayList<Session>();
+    		Database db = new Database();
 
+             // SQL INSERT query using PreparedStatement
+            String insertSQL = "INSERT INTO session (tutorid, studentid, courseid, sessiondate, starttime, endtime) VALUES (?, ?, ?, ?, ?, ?)";
+
+			// Insert values
+            int generatedId = db.execute(insertSQL, session.getTutorId(), session.getStudentId(), session.getCourseId(), session.getSessionDate(), session.getStartTime(), session.getEndTime());
+
+            // Check the result
+            if (generatedId != -1) {
+                System.out.println("Session successfully with ID: " + generatedId);
+                sessions = getSessions(session.getStudentId(), "student");
+            } else {
+                System.out.println("Insert failed.");
+            }
+
+
+        	return sessions;		
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} 
+        
+    }
 	
+	public List<Session> deleteSession(Long sessionId, Long studentID) {
+		try {
+			System.out.println("papoosi delete session sessionid " + sessionId);
+		
+            List<Session> sessions = new ArrayList<Session>();
+    		Database db = new Database();
+
+             // SQL DELETE query using PreparedStatement
+            String deleteSQL = "DELETE FROM Sessions WHERE sessionID = " + sessionId.intValue();
+
+			// Insert values
+            int result = db.execute(deleteSQL);
+
+            // Check the result
+            if (result != -1) {
+                System.out.println("Session successfully deleted with ID: " + result);
+                sessions = getSessions(studentID.intValue(), "student");
+            } else {
+                System.out.println("Delete failed.");
+            }
+        	return sessions;		
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} 
+	}
 }

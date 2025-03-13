@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -173,6 +174,24 @@ public class APIController {
 		}
 	}
 
+	@DeleteMapping("/deleteAvailability/{availabilityId}/{tutorID}")
+	public List<TutorAvailability> deleteAvailability(
+		@PathVariable Long availabilityId, 
+        @PathVariable Long tutorID
+	) {
+		List<TutorAvailability> tAvailabilities = new ArrayList<TutorAvailability>();
+		try {
+			System.out.printf("1. Delete availabilities \n%s\n", availabilityId);
+			tAvailabilities = service.deleteAvailability(availabilityId, tutorID);
+
+			System.out.printf("2. post delete availability: \n%s\n", tAvailabilities);
+			return tAvailabilities;
+		} catch (Exception ex) {
+			System.err.println("post auth error:" + ex);
+			return tAvailabilities;
+		}
+	}
+
 	@GetMapping("/searchtutors")
 	public List<Account> getSearchTutors(
 		@RequestParam(required = false) Integer courseId, 
@@ -191,4 +210,37 @@ public class APIController {
 			return tutorAccts;
 		}
 	}
+	@PostMapping("/addSession")
+	public List<Session> addSession(@RequestBody Session session) {
+		List<Session> sessions = new ArrayList<Session>();
+		try {
+			System.out.printf("1. Add session \n%s\n", session);
+			sessions = service.addSession(session);
+
+			System.out.printf("2. post add session: \n%s\n", session);
+			return sessions;
+		} catch (Exception ex) {
+			System.err.println("post auth error:" + ex);
+			return sessions;
+		}
+	}
+
+	@DeleteMapping("/deleteSession/{sessionId}/{studentID}")
+	public List<Session> deleteSession(
+		@PathVariable Long sessionId, 
+        @PathVariable Long studentID
+	) {
+		List<Session> sessions = new ArrayList<Session>();
+		try {
+			System.out.printf("1. Delete sessions \n%s\n", sessionId);
+			sessions = service.deleteSession(sessionId, studentID);
+
+			System.out.printf("2. post delete sessions: \n%s\n", sessions);
+			return sessions;
+		} catch (Exception ex) {
+			System.err.println("post auth error:" + ex);
+			return sessions;
+		}
+	}
 }
+

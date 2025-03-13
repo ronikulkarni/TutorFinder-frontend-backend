@@ -94,4 +94,20 @@ public class MainService {
     public List<Account> getSearchTutors(Integer courseId, String firstName, String lastName) {
 		return accountDAO.getSearchTutors(courseId, firstName, lastName);
     }
+
+    public List<Session> addSession(Session session) {
+		sessionDAO = new SessionDAO();
+		return sessionDAO.addSession(session);
+    }
+
+    public List<TutorAvailability> deleteAvailability(Long availabilityId, Long tutorID) {
+		tutorAvailabilityDAO = new TutorAvailabilityDAO();
+		return tutorAvailabilityDAO.deleteAvailability(availabilityId,tutorID);
+
+    }
+
+    public List<Session> deleteSession(Long sessionId, Long studentID) {
+        sessionDAO = new SessionDAO();
+		return sessionDAO.deleteSession(sessionId,studentID);
+    }
 }
