@@ -151,6 +151,13 @@ form select option {
   color: black;
 }
 
+.large-dropdown {
+  height: 180px; /* Adjust height to fit more options */
+  font-size: 16px; /* Increase text size */
+   background: white;
+  color: black;
+}
+
 form button{
   margin-top: 10px;
   border: none;
@@ -215,6 +222,10 @@ font-weight: 600;
 cursor: pointer;
 text-align: center;
 transition: 0.3s ease;
+}
+
+.hidden {
+  display: none;
 }
 
 .role-btn:hover,

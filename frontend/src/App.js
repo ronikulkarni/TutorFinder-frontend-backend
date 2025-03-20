@@ -6,6 +6,9 @@ import StudentDashboard from "./components/StudentDashboard";
 import TutorDashboard from "./components/TutorDashboard";
 import Availability from "./components/Availability";
 import Search from "./components/Search";
+import ScheduleSession from "./components/ScheduleSession";
+import Calendar from "./components/Calendar";
+
 
 const App = () => {
   return (
@@ -19,6 +22,9 @@ const App = () => {
       <Route path="/tutorsearch" element={<Search />} />
       <Route path="/availability" element={<Availability />}  />
       <Route path="/search" element={<Search />}  />
+      <Route path="/schedulesession" element={<ScheduleSession />}  />
+      <Route path="/calendar" element={<Calendar />}  />
+   
       
       <Route path="*" element={<h1>404 - Page Not Found</h1>} /> 
     </Routes>

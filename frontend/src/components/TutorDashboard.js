@@ -3,7 +3,7 @@ import "../styles/style2.css";
 import { Link } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
 import { ReactComponent as TrashIcon } from "../assets/trash.svg";
-
+import { API_URL } from "../config";
 
 const DataContext = createContext();
 
@@ -26,7 +26,7 @@ useEffect(() => {
         accountType:accData.accountType
       }
       console.log("stringify 2:", JSON.stringify(accountdata))
-      const sessionsresp = await fetch ("http://localhost:8081/api/sessions",
+      const sessionsresp = await fetch (`${API_URL}/sessions`,
         {
           method:"POST",
           headers:{
@@ -49,7 +49,7 @@ useEffect(() => {
         accountId:accData.accountId
       }
       console.log("stringify 3:", JSON.stringify(availabilitydata))
-      const availabilityresp = await fetch ("http://localhost:8081/api/tutorAvailabilities",
+      const availabilityresp = await fetch (`${API_URL}/tutorAvailabilities`,
         {
           method:"POST",
           headers:{

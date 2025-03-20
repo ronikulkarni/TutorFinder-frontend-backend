@@ -8,7 +8,7 @@ import { useState } from "react";
 import calendarIcon from "../assets/calendar.svg";
 import timeIcon from "../assets/time.svg";
 import { ReactComponent as TrashIcon } from "../assets/trash.svg";
-
+import { API_URL } from "../config";
 
 const Availability = () => {
   const location = useLocation();
@@ -37,6 +37,7 @@ const Availability = () => {
     setErrors(newErrors);
     return newErrors.length === 0;
   };
+
   const handleSubmit =async (e) => {
     e.preventDefault();
     setErrors([]); // Clear previous errors
@@ -58,7 +59,7 @@ const Availability = () => {
             
         }
         console.log("stringify 3:", JSON.stringify(availabilitydata))
-        const availabilityresp = await fetch ("http://localhost:8081/api/addAvailability",
+        const availabilityresp = await fetch (`${API_URL}/addAvailability`,
         {
             method:"POST",
             headers:{
@@ -89,7 +90,7 @@ const Availability = () => {
     if (!isConfirmed) return; // Stop if user cancels
 
     try {
-        const availabilityresp = await fetch(`http://localhost:8081/api/deleteAvailability/${availabilityId}/${tutorId}`, {
+        const availabilityresp = await fetch(`${API_URL}/deleteAvailability/${availabilityId}/${tutorId}`, {
             method: "DELETE",
         });
 

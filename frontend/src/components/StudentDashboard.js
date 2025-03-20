@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import { ReactComponent as TrashIcon } from "../assets/trash.svg";
+import { API_URL } from "../config";
 
 const Dashboard = () => {
   const location = useLocation();
@@ -26,7 +27,7 @@ useEffect(() => {
           accountType:accData.accountType
         }
         console.log("stringify 2:", JSON.stringify(accountdata))
-        const sessionsresp = await fetch ("http://localhost:8081/api/sessions",
+        const sessionsresp = await fetch (`${API_URL}/sessions`,
           {
             method:"POST",
             headers:{
@@ -49,7 +50,7 @@ useEffect(() => {
         course:accData.course
       }
       console.log("stringify 3:", JSON.stringify(coursedata))
-      const tutorsresp = await fetch ("http://localhost:8081/api/tutorsforcourse",
+      const tutorsresp = await fetch (`${API_URL}/tutorsforcourse`,
       {
           method:"POST",
           headers:{
@@ -78,7 +79,7 @@ const handleDelete = async (sessionId, studentId) => {
   if (!isConfirmed) return; // Stop if user cancels
 
   try {
-      const response = await fetch(`http://localhost:8081/api/deleteSession/${sessionId}/${studentId}`, {
+      const response = await fetch(`${API_URL}/deleteSession/${sessionId}/${studentId}`, {
           method: "DELETE",
       });
 

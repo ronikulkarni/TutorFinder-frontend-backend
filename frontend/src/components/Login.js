@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/style.css";
 import lockIcon from "../assets/lock.svg";
+import { API_URL } from "../config";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -33,9 +34,10 @@ const Login = () => {
           emailId:formData.email,
           password:formData.password
         }
+        console.log("API_URL:",API_URL)
         console.log("login:",data);
         console.log("stringify 1:", JSON.stringify(data))
-        const resp = await fetch ("http://localhost:8081/api/auth",
+        const resp = await fetch (`${API_URL}/auth`,
           {
           method:"POST",
           headers:{

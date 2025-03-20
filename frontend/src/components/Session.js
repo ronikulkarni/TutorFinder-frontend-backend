@@ -199,4 +199,4 @@ const toggleTheme = () => {
   document.querySelector(".dashboard-wrapper").classList.toggle("dark-theme");
 };
 
-export default Search;
+export default Session;

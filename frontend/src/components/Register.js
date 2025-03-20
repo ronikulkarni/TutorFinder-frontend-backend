@@ -1,28 +1,38 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import "../styles/style.css";
+import "../styles/style2.css";
 import personIcon from "../assets/person.svg";
 import lockIcon from "../assets/lock.svg";
 import phoneIcon from "../assets/phone.svg";
-import courseIcon from "../assets/book.svg";
-
-
+import bookIcon from "../assets/book.svg";
+import { API_URL } from "../config";
 
 const Register = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState("");
-
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const options = ["React", "Vue", "Angular", "Svelte"];
-
+  const [courses, setCourses] = useState([]); // Stores course list from API
+  const [selectedCourses, setSelectedCourses] = useState([]);
+ 
   const [formData, setFormData] = useState({ firstname: "", lastname: "", email: "", password: "", repeatPassword: "", phonenumber: "", course: "" });
   const [errors, setErrors] = useState([]);
 
+   // Fetch course list from API when component loads
+   useEffect(() => {
+    fetch(`${API_URL}/courses`)
+      .then((res) => res.json())
+      .then((data) => setCourses(data))
+      .catch((err) => console.error("Error fetching courses:", err));
+  }, []);
+
+  const handleCourseChange = (e) => {
+    const selectedValues = Array.from(e.target.selectedOptions, option => option.value);
+    setSelectedCourses(selectedValues);
+  };
+
   const handleChange = (e) => {
-    const values = Array.from(e.target.selectedOptions, (option) => option.value);
-    setSelectedOptions(values);
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
@@ -32,6 +42,7 @@ const Register = () => {
 
   const validateForm = () => {
     let newErrors = [];
+    if (!role.trim()) newErrors.push("Please select if you are a Student or a Tutor");
     if (!formData.firstname.trim()) newErrors.push("First Name is required");
     if (!formData.lastname.trim()) newErrors.push("Last Name is required");
     if (!formData.email.trim()) newErrors.push("Email is required");
@@ -42,18 +53,72 @@ const Register = () => {
     return newErrors.length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit =async (e) => {
     e.preventDefault();
     if (validateForm()) {
       console.log("User Registered", formData, role);
-      // Redirect based on role
-      if (role === "student") {
-        navigate("/studentdashboard");
-      } else if (role === "tutor") {
-        navigate("/tutordashboard");
-      }
-    }
-  };
+      console.log("Submitted Course IDs:", selectedCourses);
+
+
+      let aErrors = [];
+      try {
+          
+          const courseString = selectedCourses.join(",");
+          const accountdata = {
+              firstName: formData.firstname,
+              lastName: formData.lastname,
+              emailId: formData.email,
+              password: formData.password,
+              phoneNumber: formData.phoneNumber,
+              accountType: role,
+              course: courseString,
+              
+          }
+          console.log("stringify :", JSON.stringify(accountdata))
+          const accountresp =  await fetch (`${API_URL}/addAccount`,
+          {
+              method:"POST",
+              headers:{
+                  "Content-Type":"application/json"
+              },
+              body:JSON.stringify(accountdata)
+          });
+          console.log("Response Status:", accountresp.status); // Log HTTP status code
+          console.log("Response OK?:", accountresp.ok); // Check if response is successful
+          console.log("Full Response Object:", accountresp); // See entire response
+
+          if (!accountresp.ok) {
+            console.error("Error Response:", accountresp.status, accountresp.statusText);
+            return;
+        }
+        let accountjson = null;
+        // ✅ Await text() to get the actual response content
+        const text = await accountresp.text();
+        console.log("API Response:", text);
+        accountjson = text ? JSON.parse(text) : null; // ✅ Convert only if not empty
+        console.log(accountjson);
+        if (accountjson.accountId === -1)
+        {
+          aErrors.push("Account with this email id already exists.");
+          aErrors.push(" Please use a different email ID or recover your password.");
+          setErrors(aErrors);
+          return;
+        }
+        else {
+          navigate(role === "student" ? "/studentdashboard" : "/tutordashboard", {
+                state: { accData: accountjson },
+          });
+        }
+    
+    }catch (ex){
+      aErrors.push("An error occurred");
+      aErrors.push("Please try again later.");      
+      setErrors(aErrors);
+      return ;
+  } 
+ }    
+};
+
 
   return (
     <div className="wrapper">
@@ -93,21 +158,19 @@ const Register = () => {
           <label htmlFor="phonenumber-input"><img src={phoneIcon} alt="Phone" /></label>
           <input type="text" id="phonenumber" placeholder="Enter Phone Number" value={formData.phonenumber} onChange={handleChange} />
         </div>
+
         <div>
-          <label htmlFor="courselabel"></label>
-          <p>Select the courses below:</p>
+          <label htmlFor="course-input"><img src={bookIcon} alt="Course" /></label>
+          <select className="large-dropdown" id="course-input" multiple  value={selectedCourses} onChange={handleCourseChange} >
+            <option value="">Select all your courses</option>
+            {courses.map((course) => (
+              <option key={course.courseId} value={course.courseId}>
+                {course.courseName}
+              </option>
+            ))}
+          </select>
         </div>
-       
-        <div>
-        <label htmlFor="course-input"><img src={courseIcon} alt="Course" /></label>
-          <Select
-            isMulti
-            options={options}
-            value={selectedOptions}
-            onChange={setSelectedOptions}
-          />
-          <p>Selected: {selectedOptions.map(option => option.label).join(",")}</p>
-        </div>
+
         <button type="submit">Signup</button>
       </form>
       <p>Already have an account? <a href="/login">Login</a></p>
