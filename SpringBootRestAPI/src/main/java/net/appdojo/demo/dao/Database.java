@@ -8,22 +8,28 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Database {
+
 	private String jdbcURL = "jdbc:mysql://localhost/test";
+
 	private String jdbcUsername = "root";
+
 	private String jdbcPassword = "";
 
 	private String[][] connections = {
-			{ "jdbc:mysql://localhost/TutorFinder", "root", "Rohan02**" ,"com.mysql.cj.jdbc.Driver"},
-	};
+			{ "jdbc:mysql://localhost/TutorFinder", "root", "Rohan02**", "com.mysql.cj.jdbc.Driver" },
+			{ "jdbc:mysql://database-1.clk6e26cqkln.us-east-2.rds.amazonaws.com/TutorFinder", "admin", "AjjiBaba2025",
+					"com.mysql.cj.jdbc.Driver" }, };
 
-	int connIndex = 0;
+	int connIndex = 1;
+
 	String memoryURL = "jdbc:sqlite::memory:";
+
 	private Connection conn;
 
 	public static void main(String[] args) {
-		//Database db = new Database();
+		// Database db = new Database();
 		testUser();
-		//System.out.println(Database.addQuestionMarks("call test", 3));
+		// System.out.println(Database.addQuestionMarks("call test", 3));
 	}
 
 	public static void testUser() {
@@ -37,10 +43,13 @@ public class Database {
 			}
 			do {
 				System.out.println(rs.getString(3));
-			} while (rs.next());
-		} catch (Exception ex) {
+			}
+			while (rs.next());
+		}
+		catch (Exception ex) {
 			ex.printStackTrace();
-		} finally {
+		}
+		finally {
 			db.close();
 		}
 	}
@@ -56,11 +65,13 @@ public class Database {
 			ps.execute();
 
 			return true;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			ex.printStackTrace();
 
 			return false;
-		} finally {
+		}
+		finally {
 			db.close();
 		}
 	}
@@ -77,7 +88,8 @@ public class Database {
 				int count = rs.getInt(1);
 				return count > 0; // If count > 0, the email is in use
 			}
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 
@@ -88,7 +100,8 @@ public class Database {
 	public static int parseInt(String val, int alt) {
 		try {
 			return Integer.parseInt(val);
-		} catch (NumberFormatException ex) {
+		}
+		catch (NumberFormatException ex) {
 			return alt;
 		}
 	}
@@ -97,13 +110,15 @@ public class Database {
 		try {
 			if (conn != null)
 				return conn;
-		//	Class.forName("com.mysql.cj.jdbc.Driver");
-            Class.forName(connections[connIndex][3]);
+			// Class.forName("com.mysql.cj.jdbc.Driver");
+			Class.forName(connections[connIndex][3]);
 			conn = DriverManager.getConnection(connections[connIndex][0], connections[connIndex][1],
 					connections[connIndex][2]);
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
+		}
+		catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		return conn;
@@ -116,9 +131,11 @@ public class Database {
 
 			PreparedStatement statement = conn.prepareStatement(sql);
 			return statement.executeUpdate();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 
-		} finally {
+		}
+		finally {
 			close();
 		}
 
@@ -129,10 +146,10 @@ public class Database {
 		try {
 			if (conn == null)
 				getConnection();
-			if (sql.indexOf("?") < 0 && values!=null && values.length>0) {
-				sql=addQuestionMarks(sql,values.length);
+			if (sql.indexOf("?") < 0 && values != null && values.length > 0) {
+				sql = addQuestionMarks(sql, values.length);
 			}
-			PreparedStatement statement =prepare(sql,true);
+			PreparedStatement statement = prepare(sql, true);
 			int row = 1;
 			for (Object obj : values) {
 				statement.setObject(row++, obj);
@@ -143,9 +160,11 @@ public class Database {
 				int newId = rs.getInt(1);
 				return newId;
 			}
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			close();
 		}
 
@@ -156,8 +175,8 @@ public class Database {
 		try {
 			if (conn == null)
 				getConnection();
-			if (sql.indexOf("?") < 0 && values!=null && values.length>0) {
-				sql=addQuestionMarks(sql,values.length);
+			if (sql.indexOf("?") < 0 && values != null && values.length > 0) {
+				sql = addQuestionMarks(sql, values.length);
 			}
 			PreparedStatement statement = conn.prepareStatement(sql);
 			int row = 1;
@@ -167,9 +186,11 @@ public class Database {
 			ResultSet rs = statement.executeQuery();
 
 			return rs;
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			// close();
 		}
 
@@ -183,13 +204,16 @@ public class Database {
 
 			if (returnId) {
 				return conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-			} else {
+			}
+			else {
 				return conn.prepareStatement(sql);
 			}
 
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 
-		} finally {
+		}
+		finally {
 			// close();
 		}
 
@@ -203,9 +227,11 @@ public class Database {
 
 			return conn.prepareStatement(sql);
 
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 
-		} finally {
+		}
+		finally {
 			// close();
 		}
 
@@ -217,8 +243,8 @@ public class Database {
 		try {
 			if (conn == null)
 				getConnection();
-			if (query.indexOf("?") < 0 && values!=null && values.length>0) {
-				query=addQuestionMarks(query,values.length);
+			if (query.indexOf("?") < 0 && values != null && values.length > 0) {
+				query = addQuestionMarks(query, values.length);
 			}
 			PreparedStatement statement = conn.prepareStatement(query);
 			int row = 1;
@@ -228,9 +254,11 @@ public class Database {
 				}
 			}
 			return statement.executeQuery();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			// close();
 		}
 		return rs;
@@ -243,7 +271,8 @@ public class Database {
 			conn.close();
 			conn = null;
 			return true;
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return false;
@@ -261,4 +290,5 @@ public class Database {
 		return str;
 
 	}
+
 }

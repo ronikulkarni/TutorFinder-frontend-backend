@@ -4,55 +4,57 @@ import java.sql.Time;
 
 public class TutorAvailability {
 
-    private int availabilityId;
-    private int tutorId;
-    private String dayOfWeek;
-    private Time startTime; 
-    private Time endTime; 
+	private int availabilityId;
 
-    public TutorAvailability() {
-    }
+	private int tutorId;
 
-    public int getAvailabilityId() {
-        return availabilityId;
-    }
+	private String dayOfWeek;
 
-    public void setAvailabilityId(int availabilityId) {
-        this.availabilityId = availabilityId;
-    }
+	private Time startTime;
 
-    public int getTutorId() {
-        return tutorId;
-    }
+	private Time endTime;
 
-    public void setTutorId(int tutorId) {
-        this.tutorId = tutorId;
-    }
+	public TutorAvailability() {
+	}
 
-    public String getDayOfWeek() {
-        return dayOfWeek;
-    }
+	public int getAvailabilityId() {
+		return availabilityId;
+	}
 
-    public void setDayOfWeek(String dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
-    }
+	public void setAvailabilityId(int availabilityId) {
+		this.availabilityId = availabilityId;
+	}
 
-    public Time getStartTime() {
-        return startTime;
-    }
+	public int getTutorId() {
+		return tutorId;
+	}
 
-    public void setStartTime(Time startTime) {
-        this.startTime = startTime;
-    }
+	public void setTutorId(int tutorId) {
+		this.tutorId = tutorId;
+	}
 
-    public Time getEndTime() {
-        return endTime;
-    }
+	public String getDayOfWeek() {
+		return dayOfWeek;
+	}
 
-    public void setEndTime(Time endTime) {
-        this.endTime = endTime;
-    }
-  
+	public void setDayOfWeek(String dayOfWeek) {
+		this.dayOfWeek = dayOfWeek;
+	}
+
+	public Time getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Time startTime) {
+		this.startTime = startTime;
+	}
+
+	public Time getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Time endTime) {
+		this.endTime = endTime;
+	}
 
 }
-

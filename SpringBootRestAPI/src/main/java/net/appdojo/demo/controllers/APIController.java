@@ -25,6 +25,7 @@ import net.appdojo.demo.services.MainService;
 @RestController()
 @RequestMapping("/api")
 public class APIController {
+
 	@Autowired
 	MainService service;
 
@@ -38,14 +39,15 @@ public class APIController {
 			System.out.printf("2. post auth: \n%s\n", authAcct);
 			if (authAcct == null) {
 				authAcct.setAccountId(0);
-				
+
 				return authAcct;
 			}
 			return authAcct;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			System.err.println("post auth error:" + ex);
 			account.setAccountId(-1);
-			
+
 			return account;
 		}
 	}
@@ -55,7 +57,8 @@ public class APIController {
 		try {
 			service.save(user);
 			return user;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			System.err.println("post auth error:" + ex);
 			user.setStatus(-1);
 			user.setUserId(0);
@@ -79,7 +82,8 @@ public class APIController {
 			user = service.getUser(id);
 			System.out.println(user);
 			return user;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			return user;
 		}
 	}
@@ -91,7 +95,8 @@ public class APIController {
 		try {
 			List<Account> accounts = service.getAccounts();
 			return accounts;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			return null;
 		}
 
@@ -106,12 +111,12 @@ public class APIController {
 
 			System.out.printf("2. post getTutorsForCourse: \n%s\n", tutorAccts);
 			return tutorAccts;
-		} catch (Exception ex) {
-			System.err.println("post auth error:" + ex);	
+		}
+		catch (Exception ex) {
+			System.err.println("post auth error:" + ex);
 			return tutorAccts;
 		}
 	}
-
 
 	@PostMapping("/sessions")
 	public List<Session> getSessions(@RequestBody Account account) {
@@ -122,12 +127,12 @@ public class APIController {
 
 			System.out.printf("2. post sessions: \n%s\n", sessions);
 			return sessions;
-		} catch (Exception ex) {
-			System.err.println("post auth error:" + ex);	
+		}
+		catch (Exception ex) {
+			System.err.println("post auth error:" + ex);
 			return sessions;
 		}
 	}
-
 
 	@GetMapping("/courses")
 	public List<Course> getCourses() {
@@ -138,8 +143,9 @@ public class APIController {
 
 			System.out.printf("2. post courses: \n%s\n", courses);
 			return courses;
-		} catch (Exception ex) {
-			System.err.println("post auth error:" + ex);	
+		}
+		catch (Exception ex) {
+			System.err.println("post auth error:" + ex);
 			return courses;
 		}
 	}
@@ -153,7 +159,8 @@ public class APIController {
 
 			System.out.printf("2. post availability: \n%s\n", tAvailabilities);
 			return tAvailabilities;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			System.err.println("post auth error:" + ex);
 			return tAvailabilities;
 		}
@@ -168,17 +175,15 @@ public class APIController {
 
 			System.out.printf("2. post add availability: \n%s\n", tAvailabilities);
 			return tAvailabilities;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			System.err.println("post auth error:" + ex);
 			return tAvailabilities;
 		}
 	}
 
 	@DeleteMapping("/deleteAvailability/{availabilityId}/{tutorID}")
-	public List<TutorAvailability> deleteAvailability(
-		@PathVariable Long availabilityId, 
-        @PathVariable Long tutorID
-	) {
+	public List<TutorAvailability> deleteAvailability(@PathVariable Long availabilityId, @PathVariable Long tutorID) {
 		List<TutorAvailability> tAvailabilities = new ArrayList<TutorAvailability>();
 		try {
 			System.out.printf("1. Delete availabilities \n%s\n", availabilityId);
@@ -186,18 +191,16 @@ public class APIController {
 
 			System.out.printf("2. post delete availability: \n%s\n", tAvailabilities);
 			return tAvailabilities;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			System.err.println("post auth error:" + ex);
 			return tAvailabilities;
 		}
 	}
 
 	@GetMapping("/searchtutors")
-	public List<Account> getSearchTutors(
-		@RequestParam(required = false) Integer courseId, 
-		@RequestParam(required = false) String firstName,  
-		@RequestParam(required = false) String lastName) 
-	{
+	public List<Account> getSearchTutors(@RequestParam(required = false) Integer courseId,
+			@RequestParam(required = false) String firstName, @RequestParam(required = false) String lastName) {
 		List<Account> tutorAccts = new ArrayList<Account>();
 		try {
 			System.out.printf("1. getSearchTutors ");
@@ -205,11 +208,29 @@ public class APIController {
 			tutorAccts = service.getSearchTutors(courseId, firstName, lastName);
 			System.out.printf("2. post getSearchTutors: \n%s\n", tutorAccts);
 			return tutorAccts;
-		} catch (Exception ex) {
-			System.err.println("post getSearchTutors error:" + ex);	
+		}
+		catch (Exception ex) {
+			System.err.println("post getSearchTutors error:" + ex);
 			return tutorAccts;
 		}
 	}
+
+	@PostMapping("/addAccount")
+	public Account addAccount(@RequestBody Account account) {
+		Account acc = null;
+		try {
+			System.out.printf("1. Add account \n%s\n", account);
+			acc = service.addAccount(account);
+
+			System.out.printf("2. post add account: \n%s\n", acc);
+			return acc;
+		}
+		catch (Exception ex) {
+			System.err.println("post auth error:" + ex);
+			return acc;
+		}
+	}
+
 	@PostMapping("/addSession")
 	public List<Session> addSession(@RequestBody Session session) {
 		List<Session> sessions = new ArrayList<Session>();
@@ -219,17 +240,15 @@ public class APIController {
 
 			System.out.printf("2. post add session: \n%s\n", session);
 			return sessions;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			System.err.println("post auth error:" + ex);
 			return sessions;
 		}
 	}
 
 	@DeleteMapping("/deleteSession/{sessionId}/{studentID}")
-	public List<Session> deleteSession(
-		@PathVariable Long sessionId, 
-        @PathVariable Long studentID
-	) {
+	public List<Session> deleteSession(@PathVariable Long sessionId, @PathVariable Long studentID) {
 		List<Session> sessions = new ArrayList<Session>();
 		try {
 			System.out.printf("1. Delete sessions \n%s\n", sessionId);
@@ -237,10 +256,11 @@ public class APIController {
 
 			System.out.printf("2. post delete sessions: \n%s\n", sessions);
 			return sessions;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			System.err.println("post auth error:" + ex);
 			return sessions;
 		}
 	}
-}
 
+}
