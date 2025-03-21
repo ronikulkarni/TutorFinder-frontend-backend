@@ -1,6 +1,7 @@
 package net.appdojo.demo.dao;
 
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import net.appdojo.demo.models.Account;
 import net.appdojo.demo.models.Session;
-import net.appdojo.demo.models.TutorAvailability;
+
 
 @Component
 public class SessionDAO extends Database {
@@ -54,7 +55,8 @@ public class SessionDAO extends Database {
 				session.setStudentId(rs.getInt("StudentID"));
 				session.setTutorId(rs.getInt("TutorID"));
 				session.setCourseId(rs.getInt("CourseID"));
-				session.setSessionDate(rs.getDate("SessionDate"));
+				//session.setSessionDate(rs.getDate("SessionDate"));
+				session.setSessionDate(rs.getObject("SessionDate", LocalDate.class));
 				session.setStartTime(rs.getTime("StartTime"));
 				session.setEndTime(rs.getTime("EndTime"));
 				session.setStudentName(rs.getString("StudentName"));
@@ -76,6 +78,7 @@ public class SessionDAO extends Database {
 
 	public List<Session> addSession(Session session) {
 		try {
+			
 			System.out.println("papoosi addavailability tutorid " + session.getTutorId());
 			System.out.println("papoosi addavailability tutorid " + session.getStudentId());
 			System.out.println("papoosi addavailability tutorid " + session.getCourseId());

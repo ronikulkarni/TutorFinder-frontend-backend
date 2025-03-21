@@ -10,6 +10,12 @@ import timezone from "dayjs/plugin/timezone";
 import { useLocation } from 'react-router-dom';
 import { API_URL } from "../config";
 import "../styles/style.css";
+import "../styles/style2.css";
+import personIcon from "../assets/person.svg";
+import bookIcon from "../assets/book.svg";
+import calendarIcon from "../assets/calendar.svg";
+import timeIcon from "../assets/time.svg";
+import { Link } from "react-router-dom";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -21,8 +27,8 @@ const { Option } = Select;
 
 const ScheduleSession = () => {
   const location = useLocation();
-  const { accData } = location.state || {};
-
+  const accData = location.state?.accData; // ✅ Extract accData safely
+  console.log(accData);
   const [courses, setCourses] = useState([]);
   const [tutors, setTutors] = useState([]);
   const [availability, setAvailability] = useState([]);
@@ -87,15 +93,26 @@ const ScheduleSession = () => {
         return;
     }
 
+    const TIMEZONE = "America/New_York";
+
+    // ✅ Convert selected times to EST explicitly before extracting the date
+    let sessionDateEST = selectedStart.tz(TIMEZONE, true).format("YYYY-MM-DD");
+    let startTimeEST = selectedStart.tz(TIMEZONE, true).format("HH:mm:ss");
+    let endTimeEST = selectedEnd.tz(TIMEZONE, true).format("HH:mm:ss");
+
+    console.log("Session Date (EST):", sessionDateEST);
+    console.log("Start Time (EST):", startTimeEST);
+    console.log("End Time (EST):", endTimeEST);
+
     const newSession = {
         tutorId: selectedTutor,
         studentId: 1,
         courseId: selectedCourse,
-        sessionDate: selectedStart.format("YYYY-MM-DD"),
-        startTime: selectedStart.format("HH:mm:ss"),
-        endTime: selectedEnd.format("HH:mm:ss"),
+        sessionDate: sessionDateEST, // ✅ Corrected Date
+        startTime: startTimeEST, // ✅ Corrected Start Time
+        endTime: endTimeEST, // ✅ Corrected End Time
     };
-
+    console.log(newSession);
     fetch(`${API_URL}/addSession`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -104,12 +121,7 @@ const ScheduleSession = () => {
     .then((res) => res.json())
     .then(() => {
         message.success("Session scheduled successfully!");
-
-        // ✅ Update booked sessions in state
         setScheduledSessions(prev => [...prev, newSession]);
-
-        // ✅ Trigger re-filtering of availability
-        setAvailability(prev => [...prev]);  // Forces a re-render
     })
     .catch(() => message.error("Failed to schedule session"));
 };
@@ -123,6 +135,34 @@ const ScheduleSession = () => {
     Friday: 5,
     Saturday: 6,
   };
+  const handleSlotClick = (info) => {
+    const TIMEZONE = "America/New_York"; // ✅ Use EST
+
+    // ✅ Extract the exact clicked time from the event
+    let selectedStart = dayjs(info.event.start).tz(TIMEZONE);
+    let selectedEnd = dayjs(info.event.end).tz(TIMEZONE);
+
+    console.log("Clicked Event Start Time (EST):", selectedStart.format());
+    console.log("Clicked Event End Time (EST):", selectedEnd.format());
+
+    // ✅ Ask user for confirmation
+    const confirmSession = window.confirm(
+        `Confirm session time:\nDate: ${selectedStart.format("YYYY-MM-DD")}\nTime: ${selectedStart.format("hh:mm A")} - ${selectedEnd.format("hh:mm A")} EST`
+    );
+
+    // ✅ If confirmed, store & submit session (using extracted event time)
+    if (confirmSession) {
+        handleScheduleSession(selectedStart, selectedEnd);
+    }
+};
+
+
+const sessionEvents = scheduledSessions.map((session) => ({
+    title: "Booked Session",
+    start: `${session.sessionDate}T${session.startTime}`,
+    end: `${session.sessionDate}T${session.endTime}`,
+    color: "red",
+}));
 
 const availabilityEvents = availability.flatMap((slot) => {
     return Array.from({ length: 14 }, (_, i) => { // ✅ Loop over the next 14 days
@@ -133,8 +173,8 @@ const availabilityEvents = availability.flatMap((slot) => {
             return []; // Skip if it's not a matching day
         }
 
-        const slotStart = availableDate.format(`YYYY-MM-DDT${slot.startTime}`);
-        const slotEnd = availableDate.format(`YYYY-MM-DDT${slot.endTime}`);
+        const slotStart = dayjs(`${availableDate.format("YYYY-MM-DD")}T${slot.startTime}`).tz("America/New_York");
+        const slotEnd = dayjs(`${availableDate.format("YYYY-MM-DD")}T${slot.endTime}`).tz("America/New_York");
 
         // ✅ Get booked sessions on this specific day
         const bookedTimes = scheduledSessions
@@ -146,41 +186,33 @@ const availabilityEvents = availability.flatMap((slot) => {
             .sort((a, b) => a.start - b.start); // ✅ Sort booked slots in order
 
         let availableSlots = [];
-        let currentStart = dayjs(slotStart).tz("America/New_York");
+        let currentStart = slotStart;
 
-        // ✅ Split the availability into sections based on booked sessions
-        for (let booked of bookedTimes) {
-            if (currentStart.isBefore(booked.start)) {
-                // ✅ Available slot before a booked session
+        // ✅ Generate 30-minute time slots within the availability window
+        while (currentStart.isBefore(slotEnd)) {
+            let nextSlot = currentStart.add(30, "minute");
+
+            // ✅ Skip this slot if it overlaps with a booked session
+            const isSlotBooked = bookedTimes.some(booked => 
+                currentStart.isBefore(booked.end) && nextSlot.isAfter(booked.start)
+            );
+
+            if (!isSlotBooked) {
                 availableSlots.push({
                     title: "Available Slot",
                     start: currentStart.format(),
-                    end: booked.start.format(),
+                    end: nextSlot.format(),
                     color: "green",
                     extendedProps: {
                         sessionDate: availableDate.format("YYYY-MM-DD"),
                         startTime: currentStart.format("HH:mm:ss"),
-                        endTime: booked.start.format("HH:mm:ss"),
+                        endTime: nextSlot.format("HH:mm:ss"),
                     },
                 });
             }
-            // ✅ Move currentStart to the end of the booked session
-            currentStart = booked.end;
-        }
 
-        // ✅ If time remains after the last booked session, add it
-        if (currentStart.isBefore(dayjs(slotEnd).tz("America/New_York"))) {
-            availableSlots.push({
-                title: "Available Slot",
-                start: currentStart.format(),
-                end: dayjs(slotEnd).format(),
-                color: "green",
-                extendedProps: {
-                    sessionDate: availableDate.format("YYYY-MM-DD"),
-                    startTime: currentStart.format("HH:mm:ss"),
-                    endTime: dayjs(slotEnd).format("HH:mm:ss"),
-                },
-            });
+            // ✅ Move to the next 30-minute interval
+            currentStart = nextSlot;
         }
 
         return availableSlots;
@@ -188,47 +220,12 @@ const availabilityEvents = availability.flatMap((slot) => {
 });
 
 
-
-const sessionEvents = scheduledSessions.map((session) => ({
-    title: "Booked Session",
-    start: `${session.sessionDate}T${session.startTime}`,
-    end: `${session.sessionDate}T${session.endTime}`,
-    color: "red",
-}));
-
-
-const handleSlotClick = (info) => {
-    const TIMEZONE = "America/New_York"; // ✅ Use EST
-
-    // ✅ Extract the exact clicked time from the event
-    let selectedStart = dayjs(info.event.start).tz(TIMEZONE);
-
-    console.log("Clicked Event Start Time (EST):", selectedStart.format());
-
-    // ✅ Correctly round down to the nearest 30-minute mark
-    let roundedStart = selectedStart.minute(Math.floor(selectedStart.minute() / 30) * 30).second(0);
-
-    // ✅ Set the session end time as 30 minutes after the rounded start
-    let roundedEnd = roundedStart.add(30, "minute");
-
-    // ✅ Debugging: Show corrected time values before confirming
-    alert(`Rounded Start Time (EST): ${roundedStart.format("YYYY-MM-DD hh:mm:ss A")} EST`);
-    alert(`Rounded End Time (EST): ${roundedEnd.format("YYYY-MM-DD hh:mm:ss A")} EST`);
-
-    // ✅ Ask user for confirmation
-    const confirmSession = window.confirm(
-        `Confirm session time:\nDate: ${roundedStart.format("YYYY-MM-DD")}\nTime: ${roundedStart.format("hh:mm:ss A")} - ${roundedEnd.format("hh:mm:ss A")} EST`
-    );
-
-    // ✅ If confirmed, store & submit session (using extracted event time)
-    if (confirmSession) {
-        handleScheduleSession(roundedStart, roundedEnd);
-    }
-};
-
   return (
-    <Card title="Schedule a Tutoring Session">
-      <label>Course:</label>
+    <div className="wrapper">
+    <h1>Schedule your session</h1>
+    <form>
+      <div>
+      <label htmlFor="course-input"><img src={bookIcon} alt="Course" /></label>
       <Select
         placeholder="Select a course"
         style={{ width: "100%", marginBottom: "10px" }}
@@ -238,10 +235,12 @@ const handleSlotClick = (info) => {
           <Option key={course.courseId} value={course.courseId}>{course.courseName}</Option>
         ))}
       </Select>
+      </div>
 
       {tutors.length > 0 && (
         <>
-          <label>Tutor:</label>
+          <div>
+          <label htmlFor="tutor-input"><img src={personIcon} alt="Tutor" /></label>
           <Select
             placeholder="Select a tutor"
             style={{ width: "100%", marginBottom: "10px" }}
@@ -251,32 +250,38 @@ const handleSlotClick = (info) => {
               <Option key={tutor.accountId} value={tutor.accountId}>{tutor.firstName} {tutor.lastName}</Option>
             ))}
           </Select>
+          </div>
         </>
       )}
-      <label>Session Date:</label>
+      <div>
+      <label htmlFor="sessiondate-input"><img src={calendarIcon} alt="Cal" /></label>
       <input
       style={{ width: "100%" }}
       value={sessionDate ? dayjs(sessionDate).format("YYYY-MM-DD") : ""}
       placeholder="No date selected"
       disabled/>
-
-      <label>Start Time:</label>
+      </div>
+      <div>
+      <label htmlFor="startTime-input"><img src={timeIcon} alt="Time" /></label>
       <input
       style={{ width: "100%" }}
       value={startTime ? dayjs(startTime).format("HH:mm:ss") : ""}
       placeholder="No time selected"
       disabled
       />
+      </div>
 
-      <label>End Time:</label>
+      <div>
+      <label htmlFor="endTime-input"><img src={timeIcon} alt="Time" /></label>
       <input
       style={{ width: "100%" }}
       value={endTime ? dayjs(endTime).format("HH:mm:ss") : ""}
       placeholder="No time selected"
       disabled
-    />
+      /></div>
       {selectedTutor && (
-        <Card title="Tutor's Weekly Schedule">
+        <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto" }}>
+  <Card title="Tutor's Weekly Schedule" style={{ width: "100%" }}>
       <FullCalendar
     plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
     initialView="timeGridWeek"
@@ -297,11 +302,13 @@ const handleSlotClick = (info) => {
     height="400px"
 />
 
-        </Card>
+        </Card></div>
       )}
 
-
-    </Card>
+    </form>
+    <p><Link to="/studentdashboard" state={{ accData }}>Back to Dashboard</Link></p>
+    
+   </div> 
   );
 };
 

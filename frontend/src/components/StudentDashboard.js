@@ -106,24 +106,17 @@ const handleDelete = async (sessionId, studentId) => {
             </button>
           </li>
           <li className="active">
-            <Link to="/dashboard">Dashboard</Link>
+            <a href="/studentdashboard" class="nav-link current" onclick="return false;">Dashboard</a>
           </li>
           <li>
-            <Link to="/profile">Profile</Link>
+            <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
+               
           </li>
-          <li>
-            <Link to="/calendar">Calendar</Link>
-          </li>
-          <li>
-            <Link to="/messages">Messages</Link>
-          </li>
+          
           <li>
             <Link to="/tutorsearch">Tutor Search</Link>
           </li>
-          <li>
-            <Link to="/settings">Settings</Link>
-          </li>
-        </ul>
+          </ul>
       </aside>
 
       {/* Main Content */}

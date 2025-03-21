@@ -177,6 +177,22 @@
     background: var(--sidebar-bg);
 }
 
+.nav-link {
+    text-decoration: none;
+    color: black;
+    padding: 5px 10px;
+    display: inline-block;
+  }
+
+  /* Selected link styling */
+  .current {
+    font-weight: bold;
+    color: gray; /* Indicate it's inactive */
+    cursor: default;
+    pointer-events: none; /* ✅ Prevents clicking */
+  }
+  
+
 /* Mobile View */
 @media (max-width: 768px) {
     .dashboard-wrapper #sidebar {

@@ -1,7 +1,8 @@
 package net.appdojo.demo.models;
 
-import java.sql.Date;
+//import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
 
 public class Session {
 
@@ -13,7 +14,7 @@ public class Session {
 
 	private int courseId;
 
-	private Date sessionDate;
+	private LocalDate sessionDate;
 
 	private Time startTime;
 
@@ -57,11 +58,11 @@ public class Session {
 		this.courseId = courseId;
 	}
 
-	public Date getSessionDate() {
+	public LocalDate getSessionDate() {
 		return sessionDate;
 	}
 
-	public void setSessionDate(Date sessionDate) {
+	public void setSessionDate(LocalDate sessionDate) {
 		this.sessionDate = sessionDate;
 	}
 
