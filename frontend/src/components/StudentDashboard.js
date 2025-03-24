@@ -112,9 +112,14 @@ const handleDelete = async (sessionId, studentId) => {
             <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
                
           </li>
-          
           <li>
-            <Link to="/tutorsearch">Tutor Search</Link>
+            <Link to="/calendar" state={{ accData }}>Calendar</Link>
+          </li>
+          <li>
+            <Link to="/tutorsearch" state={{ accData }}>Tutor Search</Link>
+          </li>
+          <li>
+            <Link to="/login" onClick={() => { navigate("/login", { state: null });}}>Sign out</Link>
           </li>
           </ul>
       </aside>

@@ -115,17 +115,17 @@ public class SessionDAO extends Database {
 
 	public List<Session> deleteSession(Long sessionId, Long studentID) {
 		try {
-			System.out.println("papoosi delete session sessionid " + sessionId);
+			System.out.println("delete session sessionid " + sessionId);
 
 			List<Session> sessions = new ArrayList<Session>();
 			Database db = new Database();
 
 			// SQL DELETE query using PreparedStatement
-			String deleteSQL = "DELETE FROM Sessions WHERE sessionID = " + sessionId.intValue();
+			String deleteSQL = "DELETE FROM sessions WHERE SessionID = " + sessionId.intValue();
 
 			// Insert values
 			int result = db.execute(deleteSQL);
-
+			System.out.println("delete session result " + result);
 			// Check the result
 			if (result != -1) {
 				System.out.println("Session successfully deleted with ID: " + result);

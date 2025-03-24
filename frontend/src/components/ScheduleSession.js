@@ -7,7 +7,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { API_URL } from "../config";
 import "../styles/style.css";
 import "../styles/style2.css";
@@ -16,6 +16,7 @@ import bookIcon from "../assets/book.svg";
 import calendarIcon from "../assets/calendar.svg";
 import timeIcon from "../assets/time.svg";
 import { Link } from "react-router-dom";
+import { Modal } from "antd";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -27,12 +28,14 @@ const { Option } = Select;
 
 const ScheduleSession = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const accData = location.state?.accData; // ✅ Extract accData safely
   console.log(accData);
   const [courses, setCourses] = useState([]);
   const [tutors, setTutors] = useState([]);
   const [availability, setAvailability] = useState([]);
   const [scheduledSessions, setScheduledSessions] = useState([]);
+  const [scheduledStudentSessions, setScheduledStudentSessions] = useState([]);
 
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedTutor, setSelectedTutor] = useState(null);
@@ -52,6 +55,7 @@ const ScheduleSession = () => {
     setTutors([]);
     setAvailability([]);
     setScheduledSessions([]);
+    setScheduledStudentSessions([]);
 
     fetch(`${API_URL}/tutorsforcourse`, {
       method: "POST",
@@ -85,6 +89,15 @@ const ScheduleSession = () => {
       .then((res) => res.json())
       .then((data) => setScheduledSessions(data))
       .catch(() => message.error("Failed to load scheduled sessions"));
+
+      fetch(`${API_URL}/sessions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accountId: accData.accountId, accountType: 'student' }),
+      })
+        .then((res) => res.json())
+        .then((data) => setScheduledStudentSessions(data))
+        .catch(() => message.error("Failed to load scheduled student sessions"));
   };
 
   const handleScheduleSession = (selectedStart, selectedEnd) => {
@@ -106,7 +119,7 @@ const ScheduleSession = () => {
 
     const newSession = {
         tutorId: selectedTutor,
-        studentId: 1,
+        studentId: accData.accountId,
         courseId: selectedCourse,
         sessionDate: sessionDateEST, // ✅ Corrected Date
         startTime: startTimeEST, // ✅ Corrected Start Time
@@ -135,34 +148,65 @@ const ScheduleSession = () => {
     Friday: 5,
     Saturday: 6,
   };
+
   const handleSlotClick = (info) => {
-    const TIMEZONE = "America/New_York"; // ✅ Use EST
-
-    // ✅ Extract the exact clicked time from the event
-    let selectedStart = dayjs(info.event.start).tz(TIMEZONE);
-    let selectedEnd = dayjs(info.event.end).tz(TIMEZONE);
-
-    console.log("Clicked Event Start Time (EST):", selectedStart.format());
-    console.log("Clicked Event End Time (EST):", selectedEnd.format());
-
-    // ✅ Ask user for confirmation
-    const confirmSession = window.confirm(
-        `Confirm session time:\nDate: ${selectedStart.format("YYYY-MM-DD")}\nTime: ${selectedStart.format("hh:mm A")} - ${selectedEnd.format("hh:mm A")} EST`
-    );
-
-    // ✅ If confirmed, store & submit session (using extracted event time)
-    if (confirmSession) {
-        handleScheduleSession(selectedStart, selectedEnd);
+    const TIMEZONE = "America/New_York";
+  
+    const start = dayjs(info.event.start).tz(TIMEZONE);
+    const end = dayjs(info.event.end).tz(TIMEZONE);
+    const title = info.event.title;
+  
+    if (title === "Tutor Booked" || title === "Student Booked") {
+      // ✅ Show read-only popup
+      Modal.info({
+        title: `${title} Session`,
+        content: (
+          <div>
+            <p><strong>Start:</strong> {start.format("YYYY-MM-DD hh:mm A")}</p>
+            <p><strong>End:</strong> {end.format("YYYY-MM-DD hh:mm A")}</p>
+          </div>
+        ),
+        okText: "Close", // Only one button
+      });
+      return; // ⛔ Don't allow scheduling on these
     }
-};
+  
+   // ✅ For available slot – show confirm modal and set values on OK
+    Modal.confirm({
+      title: "Confirm Session Slot",
+      content: (
+        <div>
+          <p><strong>Start:</strong> {start.format("YYYY-MM-DD hh:mm A")}</p>
+          <p><strong>End:</strong> {end.format("YYYY-MM-DD hh:mm A")}</p>
+        </div>
+      ),
+      okText: "OK",
+      cancelText: "Cancel",
+      onOk: () => {
+        setSessionDate(start);
+        setStartTime(start);
+        setEndTime(end);
+      },
+    });
+  };
+  
 
 
 const sessionEvents = scheduledSessions.map((session) => ({
-    title: "Booked Session",
+    title: "Tutor Booked",
     start: `${session.sessionDate}T${session.startTime}`,
     end: `${session.sessionDate}T${session.endTime}`,
     color: "red",
 }));
+
+const studentSessionEvents = scheduledStudentSessions.map((session) => ({
+  title: "Student Booked",
+  start: `${session.sessionDate}T${session.startTime}`,
+  end: `${session.sessionDate}T${session.endTime}`,
+  color: "orange",
+}));
+
+
 
 const availabilityEvents = availability.flatMap((slot) => {
     return Array.from({ length: 14 }, (_, i) => { // ✅ Loop over the next 14 days
@@ -176,7 +220,7 @@ const availabilityEvents = availability.flatMap((slot) => {
         const slotStart = dayjs(`${availableDate.format("YYYY-MM-DD")}T${slot.startTime}`).tz("America/New_York");
         const slotEnd = dayjs(`${availableDate.format("YYYY-MM-DD")}T${slot.endTime}`).tz("America/New_York");
 
-        // ✅ Get booked sessions on this specific day
+        // ✅ Get tutor booked sessions on this specific day
         const bookedTimes = scheduledSessions
             .filter(session => session.sessionDate === availableDate.format("YYYY-MM-DD"))
             .map(session => ({
@@ -184,6 +228,16 @@ const availabilityEvents = availability.flatMap((slot) => {
                 end: dayjs(`${session.sessionDate}T${session.endTime}`).tz("America/New_York")
             }))
             .sort((a, b) => a.start - b.start); // ✅ Sort booked slots in order
+
+
+         // ✅ Get student booked sessions on this specific day
+         const studentBookedTimes = scheduledStudentSessions
+         .filter(session => session.sessionDate === availableDate.format("YYYY-MM-DD"))
+         .map(session => ({
+             start: dayjs(`${session.sessionDate}T${session.startTime}`).tz("America/New_York"),
+             end: dayjs(`${session.sessionDate}T${session.endTime}`).tz("America/New_York")
+         }))
+         .sort((a, b) => a.start - b.start); // ✅ Sort booked slots in order
 
         let availableSlots = [];
         let currentStart = slotStart;
@@ -197,7 +251,11 @@ const availabilityEvents = availability.flatMap((slot) => {
                 currentStart.isBefore(booked.end) && nextSlot.isAfter(booked.start)
             );
 
-            if (!isSlotBooked) {
+            // ✅ Skip this slot if it overlaps with a booked session
+            const isSlotBookedByStudent = studentBookedTimes.some(booked => 
+              currentStart.isBefore(booked.end) && nextSlot.isAfter(booked.start)
+            );
+            if (!isSlotBooked && !isSlotBookedByStudent ) {
                 availableSlots.push({
                     title: "Available Slot",
                     start: currentStart.format(),
@@ -221,10 +279,48 @@ const availabilityEvents = availability.flatMap((slot) => {
 
 
   return (
-    <div className="wrapper">
-    <h1>Schedule your session</h1>
-    <form>
-      <div>
+    <div className="dashboard-wrapper">
+    {/* Sidebar */}
+    <aside id="sidebar">
+      <ul>
+        <li className="logo">
+          <span>TutorFinder</span>
+          <button onClick={toggleSidebar} id="toggle-btn">
+            <i className="fa-solid fa-bars"></i>
+          </button>
+        </li>
+        <li className="active">
+          <Link to="/studentdashboard" state={{ accData }}>Dashboard</Link>
+        </li>
+        <li className="active">
+            <a href="/schedulesession" class="nav-link current" onclick="return false;">Schedule Session</a>
+        </li>
+        <li>
+            <Link to="/tutorsearch" state={{ accData }}>Tutor Search</Link>
+        </li>
+        <li >
+         <Link to="/login" onClick={() => { navigate("/login", { state: null });}}>Sign out</Link>
+        </li>
+      </ul>
+    </aside>
+
+    {/* Main Content */}
+    <main className="dashboard-main">
+      <nav className="navbar">
+        <button className="theme-toggle" onClick={toggleTheme}>
+          <i className="fa-regular fa-moon"></i>
+          <i className="fa-regular fa-sun"></i>
+        </button>
+        <div className="user-profile">
+          <img src="/assets/profile.jpg" alt="Profile" className="avatar" />
+        </div>
+      </nav>
+
+      <section className="content">
+      <h1>Schedule a session</h1>
+      <br></br>
+      <form style={{ width: "100%", margin: "0 auto" }}>
+      <div  style={{ width: "50%"}}>
       <label htmlFor="course-input"><img src={bookIcon} alt="Course" /></label>
       <Select
         placeholder="Select a course"
@@ -239,7 +335,7 @@ const availabilityEvents = availability.flatMap((slot) => {
 
       {tutors.length > 0 && (
         <>
-          <div>
+          <div style={{ width: "50%"}}> 
           <label htmlFor="tutor-input"><img src={personIcon} alt="Tutor" /></label>
           <Select
             placeholder="Select a tutor"
@@ -253,7 +349,7 @@ const availabilityEvents = availability.flatMap((slot) => {
           </div>
         </>
       )}
-      <div>
+       <div style={{ width: "50%"}}> 
       <label htmlFor="sessiondate-input"><img src={calendarIcon} alt="Cal" /></label>
       <input
       style={{ width: "100%" }}
@@ -261,7 +357,7 @@ const availabilityEvents = availability.flatMap((slot) => {
       placeholder="No date selected"
       disabled/>
       </div>
-      <div>
+      <div style={{ width: "50%"}}> 
       <label htmlFor="startTime-input"><img src={timeIcon} alt="Time" /></label>
       <input
       style={{ width: "100%" }}
@@ -271,7 +367,7 @@ const availabilityEvents = availability.flatMap((slot) => {
       />
       </div>
 
-      <div>
+      <div style={{ width: "50%"}}> 
       <label htmlFor="endTime-input"><img src={timeIcon} alt="Time" /></label>
       <input
       style={{ width: "100%" }}
@@ -279,8 +375,13 @@ const availabilityEvents = availability.flatMap((slot) => {
       placeholder="No time selected"
       disabled
       /></div>
+       <div style={{ width: "50%"}}> 
+      <Button type="primary" onClick={() => handleScheduleSession(startTime, endTime)} block>
+          Schedule Session
+      </Button></div>
+     
       {selectedTutor && (
-        <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto" }}>
+        <div style={{ width: "100%", maxWidth: "100%", margin: "0 auto" }}>
   <Card title="Tutor's Weekly Schedule" style={{ width: "100%" }}>
       <FullCalendar
     plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -288,11 +389,17 @@ const availabilityEvents = availability.flatMap((slot) => {
     events={[
         ...availabilityEvents, // ✅ Available slots
         ...scheduledSessions.map(session => ({ // ✅ Booked sessions
-            title: "Booked Session",
+            title: "Tutor Booked",
             start: `${session.sessionDate}T${session.startTime}`,
             end: `${session.sessionDate}T${session.endTime}`,
             color: "red",
-        }))
+        })), 
+        ...scheduledStudentSessions.map(session => ({ // ✅ Booked sessions
+          title: "Student Booked",
+          start: `${session.sessionDate}T${session.startTime}`,
+          end: `${session.sessionDate}T${session.endTime}`,
+          color: "orange",
+      })), 
     ]}
     validRange={{
         start: dayjs().format("YYYY-MM-DD"), // ✅ Starts today
@@ -306,10 +413,21 @@ const availabilityEvents = availability.flatMap((slot) => {
       )}
 
     </form>
-    <p><Link to="/studentdashboard" state={{ accData }}>Back to Dashboard</Link></p>
+    </section>
+    </main>
+    </div>
     
-   </div> 
   );
+};
+
+// Sidebar toggle function
+const toggleSidebar = () => {
+  document.getElementById("sidebar").classList.toggle("collapsed");
+};
+
+// Theme Toggle (Only affects dashboard)
+const toggleTheme = () => {
+  document.querySelector(".dashboard-wrapper").classList.toggle("dark-theme");
 };
 
 export default ScheduleSession;

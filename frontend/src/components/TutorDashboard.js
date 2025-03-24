@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useContext, useState } from "react";
 import "../styles/style2.css"; 
 import { Link } from "react-router-dom";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ReactComponent as TrashIcon } from "../assets/trash.svg";
 import { API_URL } from "../config";
 
@@ -9,6 +9,7 @@ const DataContext = createContext();
 
 const Dashboard = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { accData } = location.state || {}; 
   console.log(accData);
   const [sessionsData, setData1] = useState(null);
@@ -85,22 +86,19 @@ useEffect(() => {
             <button onClick={toggleSidebar} id="toggle-btn">
               <i className="fa-solid fa-bars"></i>
             </button>
+        </li>
+        <li className="active">
+           <a href="/tutordashboard" class="nav-link current" onclick="return false;">Dashboard</a>
+        </li>
+        <li>
+            <Link to="/calendar" state={{ accData }}>Calendar</Link>
           </li>
-          <li className="active">
-            <Link to="/dashboard">Dashboard</Link>
-          </li>
-          <li>
-            <Link to="/profile">Profile</Link>
-          </li>
-          <li>
-            <Link to="/calendar">Calendar</Link>
-          </li>
-          <li>
-            <Link to="/messages">Messages</Link>
-          </li>
-          <li>
-            <Link to="/settings">Settings</Link>
-          </li>
+        <li className="active">
+           <Link to="/availability" state={{ accData, availabilityData }}>My Availability</Link>
+         </li>
+         <li >
+         <Link to="/login" onClick={() => { navigate("/login", { state: null });}}>Sign out</Link>
+         </li>
         </ul>
       </aside>
 

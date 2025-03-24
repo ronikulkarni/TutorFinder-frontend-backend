@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from 'react-router-dom';
 import "../styles/style2.css"; 
 import "../styles/style.css"; 
 import { Link } from "react-router-dom";
@@ -9,7 +10,9 @@ import { API_URL } from "../config";
 
 const Search = () => {
 
-
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { accData } = location.state || {}; 
   const [searchType, setSearchType] = useState(""); // Selected search type
   const [courses, setCourses] = useState([]); // Stores course list from API
   const [selectedCourse, setSelectedCourse] = useState(""); // Selected course
@@ -67,20 +70,18 @@ const Search = () => {
             <i className="fa-solid fa-bars"></i>
           </button>
         </li>
+     
         <li className="active">
-          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/studentdashboard" state={{ accData }}>Dashboard</Link>
         </li>
+        <li className="active">
+           <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
+         </li>
         <li>
-          <Link to="/profile">Profile</Link>
+            <a href="/tutorsearch" class="nav-link current" onclick="return false;">Tutor Search</a>
         </li>
-        <li>
-          <Link to="/calendar">Calendar</Link>
-        </li>
-        <li>
-          <Link to="/messages">Messages</Link>
-        </li>
-        <li>
-          <Link to="/settings">Settings</Link>
+        <li >
+         <Link to="/login" onClick={() => { navigate("/login", { state: null });}}>Sign out</Link>
         </li>
       </ul>
     </aside>

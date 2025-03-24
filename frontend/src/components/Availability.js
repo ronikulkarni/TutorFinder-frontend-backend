@@ -124,20 +124,14 @@ const Availability = () => {
             </button>
           </li>
           <li className="active">
-            <Link to="/dashboard">Dashboard</Link>
-          </li>
-          <li>
-            <Link to="/profile">Profile</Link>
-          </li>
-          <li>
-            <Link to="/calendar">Calendar</Link>
-          </li>
-          <li>
-            <Link to="/messages">Messages</Link>
-          </li>
-          <li>
-            <Link to="/settings">Settings</Link>
-          </li>
+           <Link to="/tutordashboard" state={{ accData }}>Dashboard</Link>
+        </li>
+        <li className="active">
+           <a href="/availability" class="nav-link current" onclick="return false;">My Availability</a>
+        </li>
+        <li >
+         <Link to="/login" onClick={() => { navigate("/login", { state: null });}}>Sign out</Link>
+        </li>
         </ul>
       </aside>
 
