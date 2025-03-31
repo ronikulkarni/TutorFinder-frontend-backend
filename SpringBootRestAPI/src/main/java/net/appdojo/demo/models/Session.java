@@ -26,6 +26,9 @@ public class Session {
 
 	private String courseName;
 
+	private String status;
+
+
 	public int getSessionId() {
 		return sessionId;
 	}
@@ -111,5 +114,13 @@ public class Session {
 		return "Session [sessionId=" + sessionId + ", tutorId=" + tutorId + ", studentId=" + studentId + ", courseId="
 				+ courseId + ", sessionDate=" + sessionDate + ", startTime=" + startTime + ", endTime=" + endTime + "]";
 	}
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
 }

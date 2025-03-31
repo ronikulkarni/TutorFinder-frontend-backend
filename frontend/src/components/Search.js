@@ -77,6 +77,9 @@ const Search = () => {
         <li className="active">
            <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
          </li>
+         <li>
+            <Link to="/calendar" state={{ accData }}>Calendar</Link>
+          </li>
         <li>
             <a href="/tutorsearch" class="nav-link current" onclick="return false;">Tutor Search</a>
         </li>
@@ -168,7 +171,7 @@ const Search = () => {
                   <td>{tutor.firstName} {tutor.lastName}</td>
                   <td>{tutor.emailId}</td>
                   <td>{tutor.phoneNumber}</td>
-                  <td>{tutor.rating || "N/A"}</td>
+                  <td>{"⭐".repeat(tutor.tutorRating)}</td>
                 </tr>
               ))
             ) : (

@@ -296,6 +296,9 @@ const availabilityEvents = availability.flatMap((slot) => {
             <a href="/schedulesession" class="nav-link current" onclick="return false;">Schedule Session</a>
         </li>
         <li>
+            <Link to="/calendar" state={{ accData }}>Calendar</Link>
+        </li>
+        <li>
             <Link to="/tutorsearch" state={{ accData }}>Tutor Search</Link>
         </li>
         <li >

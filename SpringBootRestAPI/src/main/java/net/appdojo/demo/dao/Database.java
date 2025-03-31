@@ -17,8 +17,11 @@ public class Database {
 
 	private String[][] connections = {
 			{ "jdbc:mysql://localhost/TutorFinder", "root", "Rohan02**", "com.mysql.cj.jdbc.Driver" },
-			{ "jdbc:mysql://database-1.clk6e26cqkln.us-east-2.rds.amazonaws.com/TutorFinder", "admin", "AjjiBaba2025",
-					"com.mysql.cj.jdbc.Driver" }, };
+			 {
+			 "jdbc:mysql://database-1.clk6e26cqkln.us-east-2.rds.amazonaws.com/TutorFinder",
+			 "admin", "AjjiBaba2025",
+			 "com.mysql.cj.jdbc.Driver" },
+	};
 
 	int connIndex = 1;
 

@@ -19,7 +19,7 @@ const Availability = () => {
   }, [location.state]);
 
   console.log("accData", accData);
-  //console.log(availabilityData);
+  console.log(availabilityData);
   //console.log(sessionsData);
 
   const navigate = useNavigate();
@@ -126,6 +126,9 @@ const Availability = () => {
           <li className="active">
            <Link to="/tutordashboard" state={{ accData }}>Dashboard</Link>
         </li>
+        <li>
+            <Link to="/calendar" state={{ accData }}>Calendar</Link>
+          </li>
         <li className="active">
            <a href="/availability" class="nav-link current" onclick="return false;">My Availability</a>
         </li>

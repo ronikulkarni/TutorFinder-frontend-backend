@@ -5,6 +5,8 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import { ReactComponent as TrashIcon } from "../assets/trash.svg";
 import { API_URL } from "../config";
+import StarRating from "./StarRating";
+
 
 const Dashboard = () => {
   const location = useLocation();
@@ -168,6 +170,8 @@ const handleDelete = async (sessionId, studentId) => {
                   <th>Date</th>
                   <th>Start Time</th>
                   <th>End Time</th>
+                  <th>Status</th>
+                  <th>Rating</th>
                   <th></th>
   
                 </tr>
@@ -184,6 +188,22 @@ const handleDelete = async (sessionId, studentId) => {
                   <td>{session.sessionDate}</td>
                   <td>{session.startTime}</td>
                   <td>{session.endTime}</td>
+                  <td>{session.status}</td>
+                  <td>
+                    {session.status === "Completed" ? (
+                     <Link
+                      to={{
+                        pathname: `/rating/${session.tutorId}/${session.studentId}/${session.tutorName}`,
+                      }}
+                      state={{ accData }}
+                      style={{ textDecoration: "none", color: "#007bff" }}
+                    >
+                    Rate Tutor
+                    </Link>
+                    ) : (
+                    "-"
+                    )}
+                  </td>
                   <td>
                   <button onClick={() => handleDelete(session.sessionId, session.studentId)} 
                 style={{ background: "none", border: "none", cursor: "pointer" }}
@@ -217,6 +237,7 @@ const handleDelete = async (sessionId, studentId) => {
                   <th>Tutor</th>
                   <th>Email ID</th>
                   <th>Phone Number</th>
+                  <th>Tutoring for</th>
                   <th>Rating</th>
                 </tr>
               </thead>
@@ -228,7 +249,8 @@ const handleDelete = async (sessionId, studentId) => {
                   <td>{tutor.firstName} {tutor.lastName}</td>
                   <td>{tutor.emailId}</td>
                   <td>{tutor.phoneNumber}</td>
-                  <td>{tutor.rating || "N/A"}</td>
+                  <td>{tutor.courseNames}</td>
+                  <td>{"⭐".repeat(tutor.tutorRating)}</td>
                 </tr>
               ))
             ) : (

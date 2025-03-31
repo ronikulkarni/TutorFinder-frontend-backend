@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 
 import net.appdojo.demo.dao.AccountDAO;
 import net.appdojo.demo.dao.CourseDAO;
+import net.appdojo.demo.dao.RatingDAO;
 import net.appdojo.demo.dao.SessionDAO;
 import net.appdojo.demo.dao.TutorAvailabilityDAO;
 import net.appdojo.demo.models.Account;
 import net.appdojo.demo.models.Course;
+import net.appdojo.demo.models.Rating;
 import net.appdojo.demo.models.Session;
 import net.appdojo.demo.models.TutorAvailability;
 import net.appdojo.demo.models.User;
@@ -25,6 +27,8 @@ public class MainService {
 	SessionDAO sessionDAO;
 
 	CourseDAO courseDAO;
+
+	RatingDAO ratingDAO;
 
 	TutorAvailabilityDAO tutorAvailabilityDAO;
 
@@ -118,5 +122,26 @@ public class MainService {
 		accountDAO = new AccountDAO();
 		return accountDAO.addAccount(account);
 	}
+
+    public boolean addRating(Rating rating) {
+        ratingDAO = new RatingDAO();
+		return ratingDAO.addRating(rating);
+    }
+
+    public int getRating(Long tutorID) {
+        ratingDAO = new RatingDAO();
+		return ratingDAO.getRating(tutorID.intValue());
+    }
+
+    public boolean sendOTP(String email) {
+		accountDAO = new AccountDAO();
+		return accountDAO.sendOTP(email);
+        
+    }
+
+    public boolean verifyOTP(String email, String otp) {
+        accountDAO = new AccountDAO();
+		return accountDAO.verifyOTP(email, otp);
+    }
 
 }

@@ -20,6 +20,7 @@ const Login = () => {
     setErrors(newErrors);
     return newErrors.length === 0;
   };
+  
   const handleSubmit =async (e) => {
     e.preventDefault();
     setErrors([]); // Clear previous errors
@@ -75,7 +76,7 @@ const Login = () => {
 
   return (
     <div className="wrapper">
-      <h1>Login</h1>
+      <h1>Tutor Finder</h1>
       {errors.length > 0 && <p className="error-message">{errors.join(". ")}</p>}
       <form onSubmit={handleSubmit}>
         <div>
@@ -89,6 +90,8 @@ const Login = () => {
         <button type="submit">Login</button>
       </form>
       <p>First Time User? <a href="/register">Signup</a></p>
+      <br></br>
+      <p>Forgot Password? <a href="/forgotpassword">Retrieve</a></p>
     </div>
   );
 };

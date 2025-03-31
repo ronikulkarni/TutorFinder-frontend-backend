@@ -62,6 +62,7 @@ public class SessionDAO extends Database {
 				session.setStudentName(rs.getString("StudentName"));
 				session.setTutorName(rs.getString("TutorName"));
 				session.setCourseName(rs.getString("CourseName"));
+				session.setStatus(rs.getString("Status"));
 
 				sessions.add(session);
 			}
@@ -79,10 +80,10 @@ public class SessionDAO extends Database {
 	public List<Session> addSession(Session session) {
 		try {
 			
-			System.out.println("papoosi addavailability tutorid " + session.getTutorId());
-			System.out.println("papoosi addavailability tutorid " + session.getStudentId());
-			System.out.println("papoosi addavailability tutorid " + session.getCourseId());
-			System.out.println("papoosi addavailability tutorid " + session.getSessionDate());
+			System.out.println(" addSession tutorid " + session.getTutorId());
+			System.out.println(" addSession studentid " + session.getStudentId());
+			System.out.println(" addSession courseid " + session.getCourseId());
+			System.out.println(" addSession date " + session.getSessionDate());
 
 			List<Session> sessions = new ArrayList<Session>();
 			Database db = new Database();

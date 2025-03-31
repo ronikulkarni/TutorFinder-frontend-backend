@@ -8,7 +8,8 @@ import Availability from "./components/Availability";
 import Search from "./components/Search";
 import ScheduleSession from "./components/ScheduleSession";
 import Calendar from "./components/Calendar";
-
+import Rating from "./components/Rating";
+import ForgotPassword from "./components/ForgotPassword";
 
 const App = () => {
   return (
@@ -24,8 +25,8 @@ const App = () => {
       <Route path="/search" element={<Search />}  />
       <Route path="/schedulesession" element={<ScheduleSession />}  />
       <Route path="/calendar" element={<Calendar />}  />
-   
-      
+      <Route path="/rating/:tutorId/:studentId/:tutorName" element={<Rating />}  />
+      <Route path="/forgotpassword" element={<ForgotPassword />}  />
       <Route path="*" element={<h1>404 - Page Not Found</h1>} /> 
     </Routes>
     </BrowserRouter>

@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import net.appdojo.demo.models.Account;
 import net.appdojo.demo.models.Session;
 import net.appdojo.demo.models.Course;
+import net.appdojo.demo.models.OtpRequest;
+import net.appdojo.demo.models.Rating;
 import net.appdojo.demo.models.TutorAvailability;
 import net.appdojo.demo.models.User;
 import net.appdojo.demo.services.MainService;
@@ -49,6 +51,33 @@ public class APIController {
 			account.setAccountId(-1);
 
 			return account;
+		}
+	}
+
+
+	@PostMapping("/sendOTP")
+	public boolean sendOTP(@RequestBody OtpRequest request) {
+		boolean success = false;
+		try {
+			success = service.sendOTP(request.getEmail());
+			return success;
+		}
+		catch (Exception ex) {
+			System.err.println("post sendOTP error:" + ex);
+			return success;
+		}
+	}
+
+	@PostMapping("/verifyOTP")
+	public boolean verifyOTP(@RequestBody OtpRequest request) {
+		boolean success = false;
+		try {
+			success = service.verifyOTP(request.getEmail(), request.getOTP());
+			return success;
+		}
+		catch (Exception ex) {
+			System.err.println("post verifyOTP error:" + ex);
+			return success;
 		}
 	}
 
@@ -260,6 +289,38 @@ public class APIController {
 		catch (Exception ex) {
 			System.err.println("post auth error:" + ex);
 			return sessions;
+		}
+	}
+
+	@PostMapping("/addRating")
+	public boolean addRating(@RequestBody Rating rating) {
+		boolean success = false;
+		try {
+			System.out.printf("1. Add rating \n%s\n", rating);
+			success = service.addRating(rating);
+
+			System.out.printf("2. post add rating: \n%s\n", success);
+			return success;
+		}
+		catch (Exception ex) {
+			System.err.println("post auth error:" + ex);
+			return success;
+		}
+	}
+
+	@GetMapping("/getRating/{tutorID}")
+	public int getRating(@PathVariable Long tutorID) {
+		int rating = -1;
+		try {
+			System.out.printf("1. Get rating \n%s\n", tutorID);
+			rating = service.getRating(tutorID);
+
+			System.out.printf("2. post get rating: \n%s\n", rating);
+			return rating;
+		}
+		catch (Exception ex) {
+			System.err.println("post auth error:" + ex);
+			return rating;
 		}
 	}
 

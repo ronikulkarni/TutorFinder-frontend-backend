@@ -177,12 +177,10 @@ const availabilityEvents = availability.flatMap((slot) => {
            <Link to="/studentdashboard" state={{ accData }}>Dashboard</Link>
           )} 
         </li>
-        {accData?.accountType === "student" ? (
-        <li>
-            <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
-        </li>
-        ) : (
-          <li></li>
+        {accData?.accountType === "student" && (
+          <li>
+              <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
+          </li>
         )}
         <li className="active">
             <a href="/calendar" class="nav-link current" onclick="return false;">Calendar</a>
@@ -191,7 +189,7 @@ const availabilityEvents = availability.flatMap((slot) => {
           {accData?.accountType === "student" ? (
             <Link to="/tutorsearch" state={{ accData }}>Tutor Search</Link>
           ) : (
-            <Link to="/availability" state={{ accData, availability}}>My availability</Link>
+            <Link to="/availability" state={{ accData, availabilityData: availability}}>My availability</Link>
           )}
         </li>
         <li >

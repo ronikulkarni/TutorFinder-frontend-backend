@@ -24,6 +24,11 @@ public class Account {
 
 	String course;
 
+	String courseNames;
+
+	int tutorRating;
+
+	
 	public int getAccountId() {
 		return accountId;
 	}
@@ -130,5 +135,21 @@ public class Account {
 		sb.append('}');
 		return sb.toString();
 	}
+
+    public String getCourseNames() {
+        return courseNames;
+    }
+
+    public void setCourseNames(String courseNames) {
+        this.courseNames = courseNames;
+    }
+
+    public int getTutorRating() {
+        return tutorRating;
+    }
+
+    public void setTutorRating(int tutorRating) {
+        this.tutorRating = tutorRating;
+    }
 
 }
