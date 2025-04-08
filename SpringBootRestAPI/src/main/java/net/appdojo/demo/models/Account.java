@@ -28,6 +28,10 @@ public class Account {
 
 	int tutorRating;
 
+	String avatarURL;
+
+	String profileURL;
+
 	
 	public int getAccountId() {
 		return accountId;
@@ -132,6 +136,9 @@ public class Account {
 		sb.append(", accountType=").append(accountType);
 		sb.append(", major=").append(major);
 		sb.append(", course=").append(course);
+		sb.append(", avatarURL=").append(avatarURL);
+		sb.append(", profileURL=").append(profileURL);
+		
 		sb.append('}');
 		return sb.toString();
 	}
@@ -151,5 +158,23 @@ public class Account {
     public void setTutorRating(int tutorRating) {
         this.tutorRating = tutorRating;
     }
+
+    public String getProfileURL() {
+        return profileURL;
+    }
+
+    public void setProfileURL(String profileURL) {
+        this.profileURL = profileURL;
+    }
+
+	public String getAvatarURL() {
+		return avatarURL;
+	}
+
+	public void setAvatarURL(String avatarURL) {
+		this.avatarURL = avatarURL;
+	}
+
+  
 
 }

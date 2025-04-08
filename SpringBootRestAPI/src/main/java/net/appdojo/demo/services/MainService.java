@@ -144,4 +144,14 @@ public class MainService {
 		return accountDAO.verifyOTP(email, otp);
     }
 
+    public List<Rating> getTutorReviews(Long tutorID) {
+		ratingDAO = new RatingDAO();
+		return ratingDAO.getTutorReviews(tutorID);
+    }
+
+    public Account updateAccount(Long accountId, Account account) {
+		accountDAO = new AccountDAO();
+		return accountDAO.updateAccount(accountId, account);
+    }
+
 }

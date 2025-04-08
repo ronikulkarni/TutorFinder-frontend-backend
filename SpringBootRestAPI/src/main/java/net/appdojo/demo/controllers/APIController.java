@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -260,6 +261,22 @@ public class APIController {
 		}
 	}
 
+	@PutMapping("/account/{accountId}")
+	public Account updateAccount(@PathVariable Long accountId, @RequestBody Account account) {
+		Account acc = null;
+		try {
+			System.out.printf("1. Update account \n%s\n", account);
+			acc = service.updateAccount(accountId, account);
+
+			System.out.printf("2. post update account: \n%s\n", acc);
+			return acc;
+		}
+		catch (Exception ex) {
+			System.err.println("post update error:" + ex);
+			return acc;
+		}
+	}
+
 	@PostMapping("/addSession")
 	public List<Session> addSession(@RequestBody Session session) {
 		List<Session> sessions = new ArrayList<Session>();
@@ -321,6 +338,24 @@ public class APIController {
 		catch (Exception ex) {
 			System.err.println("post auth error:" + ex);
 			return rating;
+		}
+	}
+
+	
+
+	@GetMapping("/tutorreviews/{tutorID}")
+	public  List<Rating> getTutorReviews(@PathVariable Long tutorID) {
+		List<Rating> reviews = new ArrayList<Rating>();
+		try {
+			System.out.printf("1. Get reviews \n%s\n", tutorID);
+			reviews = service.getTutorReviews(tutorID);
+
+			System.out.printf("2. post get review: \n%s\n", reviews);
+			return reviews;
+		}
+		catch (Exception ex) {
+			System.err.println("post auth error:" + ex);
+			return reviews;
 		}
 	}
 

@@ -157,12 +157,14 @@ public class Database {
 			for (Object obj : values) {
 				statement.setObject(row++, obj);
 			}
-			statement.executeUpdate();
+			int rowsAffected = statement.executeUpdate();
 			ResultSet rs = statement.getGeneratedKeys();
-			if (rs.next()) {
+			if (rs.next() ) {
 				int newId = rs.getInt(1);
 				return newId;
-			}
+			} else if (rowsAffected > 0)
+				return rowsAffected;
+
 		}
 		catch (SQLException e) {
 			e.printStackTrace();

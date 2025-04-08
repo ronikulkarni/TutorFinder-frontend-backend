@@ -2,6 +2,9 @@ package net.appdojo.demo.dao;
 
 
 import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -79,4 +82,45 @@ public class RatingDAO extends Database{
 			return rating;
 		}
 	}
+
+    public List<Rating> getTutorReviews(Long tutorID) {
+        try {
+			System.out.println("getTutorReviews acctId " + tutorID);
+
+			Database db = new Database();
+
+			ResultSet rs = null;
+
+			rs = db.getResultSet(
+						"SELECT r.*, CONCAT(st.firstname,' ',st.lastname) as StudentName FROM Ratings r LEFT JOIN account st ON r.StudentID = st.AccountID where TutorID = "
+						+ tutorID + " order by CreatedAt desc");
+
+			if (rs == null || !rs.next()) {
+				System.err.println("Query failed");
+				return null;
+			}
+
+			List<Rating> reviews = new ArrayList<Rating>();
+
+			do {
+
+				Rating rating = new Rating();
+				rating.setRating(rs.getInt("Rating"));
+				rating.setComment(rs.getString("Comment"));
+				rating.setStudentName(rs.getString("StudentName"));
+				rating.setCreatedAt(rs.getObject("CreatedAt", LocalDate.class));
+
+
+				reviews.add(rating);
+			}
+			while (rs.next());
+
+			return reviews;
+
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+    }
 }

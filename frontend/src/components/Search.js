@@ -98,8 +98,16 @@ const Search = () => {
           <i className="fa-regular fa-sun"></i>
         </button>
         <div className="user-profile">
-          <img src="/assets/profile.jpg" alt="Profile" className="avatar" />
-        </div>
+            {accData?.profileURL ? (
+              <img src={accData.profileURL} alt="Avatar" className="avatar" />
+            ) : accData?.avatarURL ? (
+              <img src={accData.avatarURL} alt="Avatar" className="avatar" />
+            ) : (
+              <div className="profile-placeholder">
+                {accData?.accountType === "student" ? "Student Profile" : "Tutor Profile"}
+              </div>
+            )}
+          </div>
       </nav>
 
       <section className="content">

@@ -1,5 +1,7 @@
 package net.appdojo.demo.models;
 
+import java.time.LocalDate;
+
 public class Rating {
 
     private int RatingId;
@@ -8,9 +10,13 @@ public class Rating {
 
 	private int studentId;
 
+    private String studentName;
+
 	private int rating;
 
     private String comment;
+
+    private LocalDate createdAt;
 
     public int getRatingId() {
         return RatingId;
@@ -56,6 +62,22 @@ public class Rating {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+
+    public LocalDate getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
     }
     
     

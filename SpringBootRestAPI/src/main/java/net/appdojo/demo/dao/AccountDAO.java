@@ -163,6 +163,8 @@ public class AccountDAO extends Database {
 			acct.setLockTime(rs.getString("LockTime"));
 			acct.setMajor(rs.getInt("Major"));
 			acct.setPhoneNumber(rs.getString("PhoneNumber"));
+			acct.setAvatarURL(rs.getString("AvatarURL"));
+			acct.setProfileURL(rs.getString("ProfilePicURL"));
 
 			return acct;
 		}
@@ -224,6 +226,10 @@ public class AccountDAO extends Database {
 			acct.setLockTime(rs.getString("LockTime"));
 			acct.setMajor(rs.getInt("Major"));
 			acct.setPhoneNumber(rs.getString("PhoneNumber"));
+			acct.setAvatarURL(rs.getString("AvatarURL"));
+			acct.setProfileURL(rs.getString("ProfilePicURL"));
+
+
 			return acct;
 		}
 		catch (Exception ex) {
@@ -540,4 +546,63 @@ public class AccountDAO extends Database {
 		}
 
 	}
+
+	public Account updateAccount(Long accountId, Account account) {
+			Database db = new Database();
+			try {
+				// Build dynamic SQL
+				StringBuilder sql = new StringBuilder("UPDATE account SET ");
+				List<Object> params = new ArrayList<>();
+		
+				if (account.getEmailId() != null) {
+					sql.append("EmailID=?, ");
+					params.add(account.getEmailId());
+				}
+				if (account.getPhoneNumber() != null) {
+					sql.append("PhoneNumber=?, ");
+					params.add(account.getPhoneNumber());
+				}
+				if (account.getPassword() != null && !account.getPassword().isEmpty()) {
+					sql.append("Password=?, ");
+					params.add(hashPassword(account.getPassword())); //  hashed with SHA-1
+				}
+				if (account.getCourse() != null) {
+					sql.append("Course=?, ");
+					params.add(account.getCourse());
+				}
+				if (account.getAvatarURL() != null) {
+					sql.append("AvatarURL=?, ");
+					params.add(account.getAvatarURL());
+				}
+				if (account.getProfileURL() != null) {
+					sql.append("ProfilePicURL=?, ");
+					params.add(account.getProfileURL());
+				}
+		
+				// Nothing to update
+				if (params.isEmpty()) {
+					System.out.println("No fields to update.");
+					return getAccount(accountId.intValue());
+				}
+		
+				// Remove trailing comma and space
+				sql.setLength(sql.length() - 2);
+				sql.append(" WHERE AccountID=?");
+				params.add(accountId);
+		
+				int rowsAffected = db.execute(sql.toString(), params.toArray());
+				System.out.println("rowsAffected" + rowsAffected);
+				if (rowsAffected > 0) {
+					return getAccount(accountId.intValue());
+				} else {
+					System.out.println("No rows updated.");
+					return null;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+	
 }

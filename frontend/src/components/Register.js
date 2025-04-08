@@ -92,7 +92,7 @@ const Register = () => {
             return;
         }
         let accountjson = null;
-        // ✅ Await text() to get the actual response content
+        // Await text() to get the actual response content
         const text = await accountresp.text();
         console.log("API Response:", text);
         accountjson = text ? JSON.parse(text) : null; // ✅ Convert only if not empty
