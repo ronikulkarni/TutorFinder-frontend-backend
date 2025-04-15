@@ -91,11 +91,17 @@ useEffect(() => {
            <a href="/tutordashboard" class="nav-link current" onclick="return false;">Dashboard</a>
         </li>
         <li>
+            <Link to="/messages" state={{ accData }}>View Messages</Link>   
+          </li>
+        <li>
             <Link to="/calendar" state={{ accData }}>Calendar</Link>
           </li>
         <li className="active">
            <Link to="/availability" state={{ accData, availabilityData }}>My Availability</Link>
          </li>
+         <li>
+            <Link to="/profile" state={{ accData }}>Manage Profile</Link>
+          </li>
          <li >
          <Link to="/login" onClick={() => { navigate("/login", { state: null });}}>Sign out</Link>
          </li>

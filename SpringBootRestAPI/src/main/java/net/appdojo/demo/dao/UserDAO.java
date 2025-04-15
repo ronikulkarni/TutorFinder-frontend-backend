@@ -81,7 +81,7 @@ public class UserDAO extends Database {
 			return null;
 		}
 		finally {
-			db.close();
+			//db.close();
 		}
 	}
 

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import net.appdojo.demo.models.Account;
 import net.appdojo.demo.models.Session;
 import net.appdojo.demo.models.Course;
+import net.appdojo.demo.models.Message;
 import net.appdojo.demo.models.OtpRequest;
 import net.appdojo.demo.models.Rating;
 import net.appdojo.demo.models.TutorAvailability;
@@ -358,5 +359,46 @@ public class APIController {
 			return reviews;
 		}
 	}
+	
+	@PostMapping("/messages/send")
+	public boolean sendMessage(@RequestBody Message msg) {
+		try {
+			System.out.printf("1. Send message \n%s\n", msg);
+			boolean result = service.sendMessage(msg);
+			System.out.printf("2. post send message: %s\n", result);
+			return result;
+		} catch (Exception ex) {
+			System.err.println("post send message error:" + ex);
+			return false;
+		}
+	}
+	
+	@GetMapping("/messages/thread/{user1}/{user2}")
+	public List<Message> getConversation(@PathVariable int user1, @PathVariable int user2) {
+		List<Message> messages = new ArrayList<>();
+		try {
+			System.out.printf("1. Get conversation for users %d and %d\n", user1, user2);
+			messages = service.getConversation(user1, user2);
+			System.out.printf("2. post get conversation: \n%s\n", messages);
+			return messages;
+		} catch (Exception ex) {
+			System.err.println("get conversation error:" + ex);
+			return messages;
+		}
+	}
+	
+	@GetMapping("/messages/partners/{userId}/{accountType}")
+	public List<Account> getPartners(@PathVariable int userId, @PathVariable String accountType) {
+		List<Account> partners = new ArrayList<>();
+		try {
+			partners = service.getMessagePartners(userId, accountType);
+			System.out.printf("2. post get partners: \n%s\n", partners);
+			return partners;
+		} catch (Exception ex) {
+			System.err.println("get partners error:" + ex);
+			return partners;
+		}
+	}
+	
 
 }

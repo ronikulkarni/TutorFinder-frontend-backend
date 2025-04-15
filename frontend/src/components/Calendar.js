@@ -177,20 +177,27 @@ const availabilityEvents = availability.flatMap((slot) => {
            <Link to="/studentdashboard" state={{ accData }}>Dashboard</Link>
           )} 
         </li>
+
         {accData?.accountType === "student" && (
           <li>
               <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
           </li>
         )}
+        <li>
+            <Link to="/messages" state={{ accData }}>View Messages</Link>   
+        </li>
         <li className="active">
-            <a href="/calendar" class="nav-link current" onclick="return false;">Calendar</a>
+            <a href="/calendar" class="nav-link current" onclick="return false;">Check Calendar</a>
         </li>
         <li>
           {accData?.accountType === "student" ? (
             <Link to="/tutorsearch" state={{ accData }}>Tutor Search</Link>
           ) : (
-            <Link to="/availability" state={{ accData, availabilityData: availability}}>My availability</Link>
+            <Link to="/availability" state={{ accData, availabilityData: availability}}>Manage Availability</Link>
           )}
+        </li> 
+        <li>
+            <Link to="/profile" state={{ accData }}>Manage Profile</Link>
         </li>
         <li >
          <Link to="/login" onClick={() => { navigate("/login", { state: null });}}>Sign out</Link>

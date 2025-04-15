@@ -171,8 +171,10 @@ const closeReviewsModal = () => {
             <a href="/studentdashboard" class="nav-link current" onclick="return false;">Dashboard</a>
           </li>
           <li>
-            <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
-               
+            <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>   
+          </li>
+          <li>
+            <Link to="/messages" state={{ accData }}>View Messages</Link>   
           </li>
           <li>
             <Link to="/calendar" state={{ accData }}>Check Calendar</Link>
@@ -250,7 +252,7 @@ const closeReviewsModal = () => {
                   <td>
                     <button
                       onClick={() => handleShowDetails(session)}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "blue", textDecoration: "underline", marginLeft: "10px" }}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#007bff", textDecoration: "underline", marginLeft: "10px" }}
                     >
                       Details
                     </button>
@@ -365,15 +367,27 @@ const closeReviewsModal = () => {
                   <td>{tutor.phoneNumber}</td>
                   <td>{tutor.courseNames}</td>
                   <td>
-                    {"⭐".repeat(tutor.tutorRating)} &nbsp;&nbsp;&nbsp;
-                    <button
-                      onClick={() => fetchTutorReviews(tutor.accountId, `${tutor.firstName} ${tutor.lastName}`)}
-                      style={{ border: "none", background: "none", color: "#007bff", textDecoration: "underline", cursor: "pointer", marginTop: "5px" }}
-                    >
-                     View Reviews
-                    </button>
-                  </td>
-                  
+                    {tutor.tutorRating > 0 ? (
+                      <>
+                        {"⭐".repeat(tutor.tutorRating)} &nbsp;&nbsp;&nbsp;
+                        <button
+                          onClick={() => fetchTutorReviews(tutor.accountId, `${tutor.firstName} ${tutor.lastName}`)}
+                          style={{
+                            border: "none",
+                            background: "none",
+                            color: "#007bff",
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                            marginTop: "5px",
+                          }}
+                        >
+                          View Reviews
+                        </button>
+                      </>
+                    ) : (
+                      "No Rating"
+                    )}
+                  </td>               
                 </tr>
               ))
             ) : (

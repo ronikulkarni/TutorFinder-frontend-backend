@@ -98,13 +98,19 @@ const Rating = () => {
            <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
          </li>
          <li>
-            <Link to="/calendar" state={{ accData }}>Calendar</Link>
+            <Link to="/messages" state={{ accData }}>View Messages</Link>   
+          </li>
+         <li>
+            <Link to="/calendar" state={{ accData }}>Check Calendar</Link>
           </li>
           <li>
             <Link to="/search" state={{ accData }}>Tutor Search</Link>
           </li>
         <li>
             <a href="/rating" class="nav-link current" onclick="return false;">Rate Tutor</a>
+        </li>
+        <li>
+            <Link to="/profile" state={{ accData }}>Manage Profile</Link>
         </li>
         <li >
          <Link to="/login" onClick={() => { navigate("/login", { state: null });}}>Sign out</Link>

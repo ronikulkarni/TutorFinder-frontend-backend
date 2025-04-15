@@ -237,7 +237,7 @@ public class AccountDAO extends Database {
 			return null;
 		}
 		finally {
-			db.close();
+		
 		}
 	}
 

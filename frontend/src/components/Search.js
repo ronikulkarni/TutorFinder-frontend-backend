@@ -78,10 +78,16 @@ const Search = () => {
            <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
          </li>
          <li>
+            <Link to="/messages" state={{ accData }}>View Messages</Link>   
+          </li>
+         <li>
             <Link to="/calendar" state={{ accData }}>Calendar</Link>
           </li>
         <li>
             <a href="/tutorsearch" class="nav-link current" onclick="return false;">Tutor Search</a>
+        </li>
+        <li>
+            <Link to="/profile" state={{ accData }}>Manage Profile</Link>
         </li>
         <li >
          <Link to="/login" onClick={() => { navigate("/login", { state: null });}}>Sign out</Link>

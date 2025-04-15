@@ -11,6 +11,7 @@ import Calendar from "./components/Calendar";
 import Rating from "./components/Rating";
 import ForgotPassword from "./components/ForgotPassword";
 import Profile from "./components/Profile";
+import Messages from "./components/Messages";
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
       <Route path="/rating/:tutorId/:studentId/:tutorName" element={<Rating />}  />
       <Route path="/forgotpassword" element={<ForgotPassword />}  />
       <Route path="/profile" element={<Profile />}  />
+      <Route path="/messages" element={<Messages />}  />
       <Route path="*" element={<h1>404 - Page Not Found</h1>} /> 
     </Routes>
     </BrowserRouter>

@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 
 import net.appdojo.demo.dao.AccountDAO;
 import net.appdojo.demo.dao.CourseDAO;
+import net.appdojo.demo.dao.MessagesDAO;
 import net.appdojo.demo.dao.RatingDAO;
 import net.appdojo.demo.dao.SessionDAO;
 import net.appdojo.demo.dao.TutorAvailabilityDAO;
 import net.appdojo.demo.models.Account;
 import net.appdojo.demo.models.Course;
+import net.appdojo.demo.models.Message;
 import net.appdojo.demo.models.Rating;
 import net.appdojo.demo.models.Session;
 import net.appdojo.demo.models.TutorAvailability;
@@ -29,6 +31,8 @@ public class MainService {
 	CourseDAO courseDAO;
 
 	RatingDAO ratingDAO;
+
+	MessagesDAO messagesDAO;
 
 	TutorAvailabilityDAO tutorAvailabilityDAO;
 
@@ -153,5 +157,21 @@ public class MainService {
 		accountDAO = new AccountDAO();
 		return accountDAO.updateAccount(accountId, account);
     }
+
+	public boolean sendMessage(Message msg) {
+		messagesDAO = new MessagesDAO();
+		int result = messagesDAO.sendMessage(msg);
+		return result != -1;
+	}
+
+	public List<Message> getConversation(int user1, int user2) {
+		messagesDAO = new MessagesDAO();
+		return messagesDAO.getConversation(user1, user2);
+	}
+
+	public List<Account> getMessagePartners(int userId, String accType) {
+		messagesDAO = new MessagesDAO();
+		return messagesDAO.getSessionBasedPartners(userId, accType);  // sessions only
+	}
 
 }

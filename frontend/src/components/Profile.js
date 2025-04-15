@@ -14,7 +14,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const { accData } = location.state || {};
   const [errors, setErrors] = useState([]);
-
+  const [availability, setAvailability] = useState([]);
   const [formData, setFormData] = useState({
     email: accData?.emailId || "",
     phoneNumber: accData?.phoneNumber || "",
@@ -118,20 +118,36 @@ const Profile = () => {
         </li>
      
         <li className="active">
-          <Link to="/studentdashboard" state={{ accData }}>Dashboard</Link>
+        {accData?.accountType === "tutor" ? (
+           <Link to="/tutordashboard" state={{ accData }}>Dashboard</Link>
+          ) : (
+           <Link to="/studentdashboard" state={{ accData }}>Dashboard</Link>
+          )} 
         </li>
-        <li className="active">
-           <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
-         </li>
-         <li>
-            <Link to="/calendar" state={{ accData }}>Calendar</Link>
+        {accData?.accountType === "student" && (
+          <li>
+              <Link to="/schedulesession" state={{ accData }}>Schedule Session</Link>
           </li>
-        <li>
-            <a href="/tutorsearch" class="nav-link current" onclick="return false;">Tutor Search</a>
-        </li>
-        <li >
-         <Link to="/login" onClick={() => { navigate("/login", { state: null });}}>Sign out</Link>
-        </li>
+        )}
+         <li>
+            <Link to="/messages" state={{ accData }}>View Messages</Link>   
+          </li>
+         <li>
+            <Link to="/calendar" state={{ accData }}>Check Calendar</Link>
+          </li>
+          <li>
+          {accData?.accountType === "student" ? (
+            <Link to="/tutorsearch" state={{ accData }}>Tutor Search</Link>
+          ) : (
+            <Link to="/availability" state={{ accData, availabilityData: availability}}>Manage Availability</Link>
+          )}
+         </li> 
+          <li>
+              <a href="/profile" class="nav-link current" onclick="return false;">Manage Profile</a>
+          </li>
+          <li >
+              <Link to="/login" onClick={() => { navigate("/login", { state: null });}}>Sign out</Link>
+          </li>
       </ul>
     </aside>
 
@@ -186,16 +202,20 @@ const Profile = () => {
 
     
           </div>
+          <br></br><br></br>
       
+          <div><h3>Choose Avatar Picture</h3> </div>
           <div>
           <label htmlFor="avatar-input"><img src={personIcon} alt="Avatar" /></label>
-          <input type="file" onChange={(e) => handleFileUpload(e, "avatar")} />
+          <input type="file" placeholder="Choose Avatar picture" onChange={(e) => handleFileUpload(e, "avatar")} />
             {formData.avatar && <img src={formData.avatar} alt="Avatar" width={80} />}
           </div>
+          <br></br><br></br>
 
+          <div><h3>Choose Profile Picture</h3> </div>
           <div>
           <label htmlFor="profilepic-input"><img src={personIcon} alt="PP" /></label>
-          <input type="file" onChange={(e) => handleFileUpload(e, "profilePic")} />
+          <input type="file" placeholder="Choose Profile picture" onChange={(e) => handleFileUpload(e, "profilePic")} />
           {formData.profilePic && <img src={formData.profilePic} alt="Profile" width={100} />}
           </div>
           
