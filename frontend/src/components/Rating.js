@@ -6,7 +6,11 @@ import { Link } from "react-router-dom";
 import searchIcon from "../assets/search.svg";
 import bookIcon from "../assets/book.svg";
 import personIcon from "../assets/person.svg";
+import starIcon from "../assets/star.svg";
+
 import { API_URL } from "../config";
+import StarRating from "./StarRating"; 
+
 
 const Rating = () => {
 
@@ -25,7 +29,10 @@ const Rating = () => {
 
   const validateForm = () => {
     let newErrors = [];
-    if (!formData.rating.trim()) newErrors.push("Please enter rating");
+
+    if (!formData.rating || formData.rating < 1 || formData.rating > 5) {
+      newErrors.push("Please select a rating between 1 and 5");
+    }
     setErrors(newErrors);
     return newErrors.length === 0;
   };
@@ -135,13 +142,17 @@ const Rating = () => {
       <h1>Rate Your Tutor</h1>
       {errors.length > 0 && <p className="error-message">{errors.join(". ")}</p>}
       <form onSubmit={handleSubmit}>
-       <div>
-          <label htmlFor="tutor-input"><img src={bookIcon} alt="Tutor" /></label>
+        <div>
+          <label htmlFor="tutor-input"><img src={personIcon} alt="Tutor" /></label>
           <input value={tutorName} disabled/>
         </div>
         <div>
-          <label htmlFor="rating-input"><img src={bookIcon} alt="Rating" /></label>
-          <input id="rating"  type="number" min="1" max="5" placeholder="Rating 1 to 5" value={formData.rating}   onChange={handleChange}/>
+          <label htmlFor="rating-input"><img src={starIcon} alt="Rating" /></label>
+          <div className="star-input-wrapper">
+          <StarRating
+            totalStars={5}
+            onRatingChange={(star) => setFormData({ ...formData, rating: star })}
+          /></div>
         </div>
         <div>
           <label htmlFor="comment-input"><img src={bookIcon} alt="Comment" /></label>

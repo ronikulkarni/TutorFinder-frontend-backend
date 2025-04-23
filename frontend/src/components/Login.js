@@ -51,13 +51,17 @@ const Login = () => {
         console.log(json);
         console.log(json.accountId );
         
-        if (json.accountId === -1){
-          aErrors.push("Invalid login credentials or account does not exist");
-          aErrors.push("Please try again later.");      
+        if (json.accountId === -2) {
+          aErrors.push("Your account is temporarily locked due to too many failed login attempts.");
+          aErrors.push("Please wait 15 minutes or use Forgot Password.");
+          setErrors(aErrors);
+          return;
+        }
+        else if (json.accountId === -1){
+          aErrors.push("Invalid login credentials");
           setErrors(aErrors);
           return;
         }else{
-
           // Redirect user based on role
           if (json.accountType === "student") {
             navigate("/studentdashboard", { state: { accData: json} });

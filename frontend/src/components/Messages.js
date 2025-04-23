@@ -98,6 +98,24 @@ const Messages = () => {
       </aside>
 
       <main className="dashboard-main">
+      <nav className="navbar">
+          <button className="theme-toggle" onClick={toggleTheme}>
+            <i className="fa-regular fa-moon"></i>
+            <i className="fa-regular fa-sun"></i>
+          </button>
+          <div className="user-profile">
+            {accData?.profileURL ? (
+              <img src={accData.profileURL} alt="Avatar" className="avatar" />
+            ) : accData?.avatarURL ? (
+              <img src={accData.avatarURL} alt="Avatar" className="avatar" />
+            ) : (
+              <div className="profile-placeholder">
+                {accData?.accountType === "student" ? "Student Profile" : "Tutor Profile"}
+              </div>
+            )}
+          </div>
+        </nav>
+        
         <section className="content">
           <h1>Messages</h1>
           <div className="card" style={{ display: "flex", gap: "20px" }}>
@@ -135,11 +153,15 @@ const Messages = () => {
                       background: "#fafafa",
                     }}
                   >
-                    {messages.map((msg, index) => (
-                      <div key={index} style={{ marginBottom: "10px" }}>
-                        <strong>{msg.senderId === accData.accountId ? "You" : selectedPartner.firstName}:</strong>
-                        <p style={{ margin: 0 }}>{msg.message}</p>
-                        <small>{new Date(msg.timestamp).toLocaleString()}</small>
+                    {Array.isArray(messages) && messages.map((msg, index) => (
+                      <div key={index} style={{ marginBottom: "10px", color: "black" }}>
+                        <strong style={{ color: "black" }}>
+                          {msg.senderName} ➝ {msg.recieverName}:
+                        </strong>
+                        <p style={{ margin: 0, color: "black" }}>{msg.message}</p>
+                        <small style={{ color: "gray" }}>
+                          {new Date(msg.timestamp).toLocaleString()}
+                        </small>
                       </div>
                     ))}
                   </div>

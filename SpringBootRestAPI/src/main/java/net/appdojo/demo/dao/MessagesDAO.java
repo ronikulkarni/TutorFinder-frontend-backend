@@ -25,9 +25,14 @@ public class MessagesDAO extends Database {
     public List<Message> getConversation(int user1, int user2) {
         List<Message> messages = new ArrayList<>();
         try {
-            String sql = "SELECT * FROM messages WHERE " +
-                         "(sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) " +
-                         "ORDER BY timestamp ASC";
+            String sql = "SELECT m.*, " +
+             "s.FirstName AS senderFirstName, s.LastName AS senderLastName, " +
+             "r.FirstName AS receiverFirstName, r.LastName AS receiverLastName " +
+             "FROM messages m " +
+             "JOIN account s ON m.sender_id = s.AccountID " +
+             "JOIN account r ON m.receiver_id = r.AccountID " +
+             "WHERE (m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?) " +
+             "ORDER BY m.timestamp ASC";
 
             ResultSet rs = getResultSet(sql, user1, user2, user2, user1);
             while (rs != null && rs.next()) {
@@ -38,7 +43,12 @@ public class MessagesDAO extends Database {
                 msg.setMessage(rs.getString("message"));
                 msg.setTimestamp(rs.getTimestamp("timestamp"));
                 msg.setReadStatus(rs.getBoolean("read_status"));
+
+                msg.setSenderName(rs.getString("senderFirstName") + " " + rs.getString("senderLastName"));
+                msg.setRecieverName(rs.getString("receiverFirstName") + " " + rs.getString("receiverLastName"));
+                
                 messages.add(msg);
+
             }
         } catch (Exception e) {
             e.printStackTrace();

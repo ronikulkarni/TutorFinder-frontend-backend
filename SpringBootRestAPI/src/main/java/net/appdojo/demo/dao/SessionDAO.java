@@ -122,10 +122,8 @@ public class SessionDAO extends Database {
 			Database db = new Database();
 
 			// SQL DELETE query using PreparedStatement
-			String deleteSQL = "DELETE FROM sessions WHERE SessionID = " + sessionId.intValue();
-
-			// Insert values
-			int result = db.execute(deleteSQL);
+			String deleteSQL = "DELETE FROM sessions WHERE SessionID = ?";
+			int result = db.execute(deleteSQL, sessionId.intValue());
 			System.out.println("delete session result " + result);
 			// Check the result
 			if (result != -1) {

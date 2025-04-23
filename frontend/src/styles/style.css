@@ -4,7 +4,7 @@
     --base-color: white;
     --text-color: black;
     --input-color: white;
-    --error-color: #f06272;
+    --error-color: #d40c23;
   }
 * {
   margin: 0;
@@ -102,6 +102,7 @@ form input{
   background-color: var(--input-color);
   transition: 150ms ease;
 }
+
 form input:hover{
   border-color: var(--accent-color);
 }

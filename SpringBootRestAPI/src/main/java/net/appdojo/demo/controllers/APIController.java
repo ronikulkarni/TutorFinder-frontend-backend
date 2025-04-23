@@ -214,8 +214,8 @@ public class APIController {
 	}
 
 	@DeleteMapping("/deleteAvailability/{availabilityId}/{tutorID}")
-	public List<TutorAvailability> deleteAvailability(@PathVariable Long availabilityId, @PathVariable Long tutorID) {
-		List<TutorAvailability> tAvailabilities = new ArrayList<TutorAvailability>();
+	public String deleteAvailability(@PathVariable Long availabilityId, @PathVariable Long tutorID) {
+		String tAvailabilities = "";
 		try {
 			System.out.printf("1. Delete availabilities \n%s\n", availabilityId);
 			tAvailabilities = service.deleteAvailability(availabilityId, tutorID);

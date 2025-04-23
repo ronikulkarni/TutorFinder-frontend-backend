@@ -111,7 +111,7 @@ public class MainService {
 		return sessionDAO.addSession(session);
 	}
 
-	public List<TutorAvailability> deleteAvailability(Long availabilityId, Long tutorID) {
+	public String deleteAvailability(Long availabilityId, Long tutorID) {
 		tutorAvailabilityDAO = new TutorAvailabilityDAO();
 		return tutorAvailabilityDAO.deleteAvailability(availabilityId, tutorID);
 

@@ -13,6 +13,9 @@ const Dashboard = () => {
   const { accData } = location.state || {}; 
   console.log(accData);
   const [sessionsData, setData1] = useState(null);
+  const scheduledSessions = sessionsData?.filter(session => session.status === "Scheduled") || [];
+  const completedSessions = sessionsData?.filter(session => session.status === "Completed") || [];
+
   const [availabilityData, setData2] = useState(null);
   
   const [loading, setLoading] = useState(true);
@@ -42,7 +45,28 @@ useEffect(() => {
         const text = await sessionsresp.text(); // Read response as text
         sessionsjson = text ? JSON.parse(text) : null; // ✅ Convert only if not empty
         console.log(sessionsjson);
-        setData1(sessionsjson);
+        // Dynamically update statuses based on current time
+        const now = new Date();
+        const updatedSessions = sessionsjson.map(session => {
+          const start = new Date(`${session.sessionDate}T${session.startTime}`);
+          const end = new Date(`${session.sessionDate}T${session.endTime}`);
+          let status = session.status;
+
+          if (status === "Scheduled") {
+            if (now > end) {
+              status = "Completed";
+            } else if (now >= start && now <= end) {
+              status = "In Progress";
+            }
+          }
+
+          return { ...session, status };
+        });
+
+        setData1(updatedSessions);
+        console.log("Scheduled sessions:", scheduledSessions);
+        console.log("Completed sessions:", completedSessions);
+        
       }
       
       //get list of availability
@@ -116,9 +140,17 @@ useEffect(() => {
             <i className="fa-regular fa-sun"></i>
           </button>
           <div className="user-profile">
-            {accData.accountType}
-            <img src="/assets/profile.jpg" alt="Profile" className="avatar" />
+            {accData?.profileURL ? (
+              <img src={accData.profileURL} alt="Avatar" className="avatar" />
+            ) : accData?.avatarURL ? (
+              <img src={accData.avatarURL} alt="Avatar" className="avatar" />
+            ) : (
+              <div className="profile-placeholder">
+                {accData?.accountType === "student" ? "Student Profile" : "Tutor Profile"}
+              </div>
+            )}
           </div>
+
         </nav>
 
         
@@ -126,21 +158,13 @@ useEffect(() => {
           <h1>{location.state.accData?.firstName || "Guest"}, welcome to Your Dashboard</h1>
           <p>Manage your tutoring sessions, schedule, and more.</p>
 
-          <div className="stats-grid">
-
-            <div className="stat-card">
-             
-              {sessionsData && sessionsData.length > 0 ? (
-                 <h4>{sessionsData.length} Upcoming session(s)</h4>
-              ) : (
-                <h4>No Upcoming Sessions.</h4>
-              ) }
-
-             </div>
-          </div>
 
           <div className="card">
-            <h3>Upcoming Sessions</h3>
+          {scheduledSessions && scheduledSessions.length > 0 ? (
+                 <h3>{scheduledSessions.length} Upcoming session(s)</h3>
+              ) : (
+                <h3>No Upcoming Sessions.</h3>
+          ) }
             <table>
               <thead>
                 <tr>
@@ -150,13 +174,12 @@ useEffect(() => {
                   <th>Date</th>
                   <th>Start Time</th>
                   <th>End Time</th>
-                  <th></th>
                 </tr>
               </thead>
               
             <tbody>
-            {sessionsData && sessionsData.length > 0 ? (
-              sessionsData.map((session, index) => (
+            {scheduledSessions && scheduledSessions.length > 0 ? (
+              scheduledSessions.map((session, index) => (
                 <tr key={session.id}>
                   <td>{session.studentName}</td>
                   <td>{session.tutorName}</td>
@@ -164,9 +187,6 @@ useEffect(() => {
                   <td>{session.sessionDate}</td>
                   <td>{session.startTime}</td>
                   <td>{session.endTime}</td>
-                  <td>
-                  <TrashIcon width={24} height={24} fill="red" />
-                  </td>
                 </tr>
               ))
             ) : (
@@ -182,7 +202,49 @@ useEffect(() => {
             </table>
           </div>
 
+          <div className="card">
+          {completedSessions && completedSessions.length > 0 ? (
+                 <h3>{completedSessions.length} Completed session(s)</h3>
+              ) : (
+                <h3>No Completed Sessions.</h3>
+          ) }
+            <table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Tutor</th>
+                  <th>Course</th>
+                  <th>Date</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+        
+                </tr>
+              </thead>
+              
+            <tbody>
+            {completedSessions && completedSessions.length > 0 ? (
+              completedSessions.map((session, index) => (
+                <tr key={session.id}>
+                  <td>{session.studentName}</td>
+                  <td>{session.tutorName}</td>
+                  <td>{session.courseName}</td>
+                  <td>{session.sessionDate}</td>
+                  <td>{session.startTime}</td>
+                  <td>{session.endTime}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" style={{ textAlign: "center", fontStyle: "italic" }}>
+                No upcoming sessions.
+                </td>
+              </tr>
+            )}
+          </tbody>
 
+
+          </table>
+          </div>
 
           <div className="card">
             <h3>Your availability</h3>

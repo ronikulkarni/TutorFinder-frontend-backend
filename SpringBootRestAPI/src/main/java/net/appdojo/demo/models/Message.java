@@ -11,12 +11,14 @@ public class Message {
     private String message;
     private Timestamp timestamp;
     private boolean readStatus;
+    private String senderName;
+    private String recieverName;
 
     
     @Override
     public String toString() {
         return "Message [id=" + id + ", senderId=" + senderId + ", receiverId=" + receiverId + ", message=" + message
-                + ", timestamp=" + timestamp + ", readStatus=" + readStatus + "]";
+                + ", senderName=" + senderName + ", recieverName=" + recieverName + ", timestamp=" + timestamp + ", readStatus=" + readStatus + "]";
     }
     public int getId() {
         return id;
@@ -57,4 +59,20 @@ public class Message {
 
     // Getters and Setters
     // ...
+
+    public String getRecieverName() {
+        return recieverName;
+    }
+
+    public void setRecieverName(String recieverName) {
+        this.recieverName = recieverName;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
 }

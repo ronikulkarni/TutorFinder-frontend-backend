@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import org.springframework.stereotype.Component;
 
@@ -61,10 +63,10 @@ public class TutorAvailabilityDAO extends Database {
 
 	public List<TutorAvailability> addAvailability(TutorAvailability tAvailability) {
 		try {
-			System.out.println("papoosi addavailability tutorid " + tAvailability.getTutorId());
-			System.out.println("papoosi addavailability tutorid " + tAvailability.getDayOfWeek());
-			System.out.println("papoosi addavailability tutorid " + tAvailability.getStartTime());
-			System.out.println("papoosi addavailability tutorid " + tAvailability.getEndTime());
+			System.out.println(" addavailability tutorid " + tAvailability.getTutorId());
+			System.out.println(" addavailability tutorid " + tAvailability.getDayOfWeek());
+			System.out.println(" addavailability tutorid " + tAvailability.getStartTime());
+			System.out.println(" addavailability tutorid " + tAvailability.getEndTime());
 
 			List<TutorAvailability> tAvailabilities = new ArrayList<TutorAvailability>();
 			Database db = new Database();
@@ -95,7 +97,7 @@ public class TutorAvailabilityDAO extends Database {
 
 	}
 
-	public List<TutorAvailability> deleteAvailability(Long availabilityId, Long tutorId) {
+	/*public List<TutorAvailability> deleteAvailability(Long availabilityId, Long tutorId) {
 		try {
 			System.out.println("papoosi addavailability tutorid " + availabilityId);
 
@@ -123,6 +125,65 @@ public class TutorAvailabilityDAO extends Database {
 			e.printStackTrace();
 			return null;
 		}
+	}*/
+
+
+
+	public String deleteAvailability(Long availabilityId, Long tutorId) {
+		Database db = new Database();
+		JSONObject response = new JSONObject();
+
+		try {
+			// 1. Fetch the availability info
+			String availQuery = "SELECT * FROM TutorAvailability WHERE AvailabilityID = ?";
+			PreparedStatement availStmt = db.prepare(availQuery, false);
+			availStmt.setLong(1, availabilityId);
+			ResultSet availRs = availStmt.executeQuery();
+
+			if (!availRs.next()) {
+				response.put("error", "Availability record not found.");
+				response.put("availabilityData", new JSONArray(getAvailability(tutorId.intValue())));
+				return response.toString();
+			}
+
+			String dayOfWeek = availRs.getString("DayOfWeek");
+			java.sql.Time startTime = availRs.getTime("StartTime");
+			java.sql.Time endTime = availRs.getTime("EndTime");
+
+			// 2. Check for conflict with sessions
+			String conflictQuery = "SELECT COUNT(*) AS conflictCount FROM sessions " +
+					"WHERE TutorID = ? AND DAYNAME(SessionDate) = ? AND StartTime < ? AND EndTime > ? AND SessionDate >= CURDATE()";
+			PreparedStatement conflictStmt = db.prepare(conflictQuery, false);
+			conflictStmt.setLong(1, tutorId);
+			conflictStmt.setString(2, dayOfWeek);
+			conflictStmt.setTime(3, endTime);
+			conflictStmt.setTime(4, startTime);
+
+			ResultSet conflictRs = conflictStmt.executeQuery();
+			if (conflictRs.next() && conflictRs.getInt("conflictCount") > 0) {
+				response.put("error", "Cannot delete availability. There are upcoming sessions scheduled during this time.");
+				response.put("availabilityData", new JSONArray(getAvailability(tutorId.intValue())));
+				return response.toString();
+			}
+
+			// 3. Proceed with deletion
+			int result = db.execute("DELETE FROM TutorAvailability WHERE AvailabilityID = ?", availabilityId);
+
+			if (result != -1) {
+				response.put("availabilityData", new JSONArray(getAvailability(tutorId.intValue())));
+			} else {
+				response.put("error", "Deletion failed.");
+				response.put("availabilityData", new JSONArray(getAvailability(tutorId.intValue())));
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("error", "An unexpected error occurred.");
+			response.put("availabilityData", new JSONArray(getAvailability(tutorId.intValue())));
+		}
+
+		return response.toString();
 	}
+
 
 }

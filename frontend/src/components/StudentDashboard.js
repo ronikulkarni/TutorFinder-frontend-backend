@@ -50,9 +50,9 @@ useEffect(() => {
         );
 
         let sessionsjson = null;
-        if (sessionsresp.ok) { // ✅ Check if the response is successful
+        if (sessionsresp.ok) { // 
           const text = await sessionsresp.text(); // Read response as text
-          sessionsjson = text ? JSON.parse(text) : null; // ✅ Convert only if not empty
+          sessionsjson = text ? JSON.parse(text) : null; //
           console.log(sessionsjson);
           // Dynamically update statuses based on current time
           const now = new Date();

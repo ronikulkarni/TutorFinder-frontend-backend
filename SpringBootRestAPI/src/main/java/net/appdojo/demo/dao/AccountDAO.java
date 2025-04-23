@@ -203,7 +203,7 @@ public class AccountDAO extends Database {
 		}
 	}
 
-	public Account auth(String email, String pw) {
+	/*public Account auth(String email, String pw) {
 		Database db = new Database();
 		try {
 			String hashPW = hashPassword(pw);
@@ -239,7 +239,70 @@ public class AccountDAO extends Database {
 		finally {
 		
 		}
+	}*/
+
+	public Account auth(String email, String pw) {
+		Database db = new Database();
+		try {
+			Account acct = getAccountByEmail(email);
+			if (acct == null) return null;
+	
+			// Check if locked
+			if (acct.getFailedAttempts() >= 3 && acct.getLockTime() != null) {
+				// Compare LockTime + 15 min with current time
+				ResultSet rsLock = db.query("SELECT TIMESTAMPDIFF(MINUTE, LockTime, NOW()) AS minutesLocked FROM account WHERE EmailID=?", email);
+				if (rsLock.next() && rsLock.getInt("minutesLocked") < 15) {
+					System.out.println("Account is still locked");
+					acct.setAccountId(-2);
+					return acct;
+				} else {
+					// Unlock account
+					db.execute("UPDATE account SET FailedAttempts=0, LockTime=NULL WHERE EmailID=?", email);
+					acct.setFailedAttempts(0);
+					acct.setLockTime(null);
+				}
+			}
+	
+			// Attempt login
+			String hashPW = hashPassword(pw);
+			ResultSet rs = db.query("SELECT * FROM account WHERE EmailID=? AND password=?", email, hashPW);
+	
+			if (rs != null && rs.next()) {
+				db.execute("UPDATE account SET FailedAttempts=0, LockTime=NULL WHERE EmailID=?", email);
+	
+				acct.setAccountId(rs.getInt("AccountID"));
+				acct.setAccountType(rs.getString("AccType"));
+				acct.setCourse(rs.getString("Course"));
+				acct.setEmailId(rs.getString("EmailID"));
+				acct.setFirstName(rs.getString("FirstName"));
+				acct.setLastName(rs.getString("lastName"));
+				acct.setPhoneNumber(rs.getString("PhoneNumber"));
+				acct.setAvatarURL(rs.getString("AvatarURL"));
+				acct.setProfileURL(rs.getString("ProfilePicURL"));
+				acct.setMajor(rs.getInt("Major"));
+				acct.setLockTime(null);
+				acct.setFailedAttempts(0);
+				return acct;
+			} else {
+				int newAttempts = acct.getFailedAttempts() + 1;
+				db.execute("UPDATE account SET FailedAttempts=? WHERE EmailID=?", newAttempts, email);
+	
+				if (newAttempts >= 3) {
+					db.execute("UPDATE account SET LockTime=NOW() WHERE EmailID=?", email);
+					acct.setAccountId(-2); // locked
+				} else {
+					acct.setAccountId(-1); // wrong password
+				}
+	
+				return acct;
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
 	}
+	
+	
 
 	public List<Account> getAccounts() {
 		Database db = new Database();
@@ -477,7 +540,8 @@ public class AccountDAO extends Database {
 	
 			// Step 3: Update the user's password in the account table
 			PreparedStatement updateStmt = db.prepare(
-				"UPDATE account SET Password = ? WHERE EmailID = ?", false
+				"UPDATE account SET Password = ?, FailedAttempts = 0, LockTime = NULL WHERE EmailID = ?",
+				false
 			);
 			updateStmt.setString(1, hashedPassword);
 			updateStmt.setString(2, email);

@@ -96,12 +96,15 @@ const Availability = () => {
 
         if (!availabilityresp.ok) throw new Error("Failed to delete");
         else{
-            alert("Item deleted successfully!");
-            let availabilityjson = null;
-            const text = await availabilityresp.text(); // Read response as text
-            availabilityjson = text ? JSON.parse(text) : null; // ✅ Convert only if not empty
-            console.log(availabilityjson);
-            navigate("/availability", { state: {accData, availabilityData: availabilityjson} });
+          const text = await availabilityresp.text();
+          const result = text ? JSON.parse(text) : null;
+          
+          if (result.error) {
+            alert(result.error);
+          }
+          navigate("/availability", {
+            state: { accData, availabilityData: result.availabilityData || [] }
+          });
 
         }
        
@@ -151,8 +154,17 @@ const Availability = () => {
             <i className="fa-regular fa-moon"></i>
             <i className="fa-regular fa-sun"></i>
           </button>
+          
           <div className="user-profile">
-            <img src="/assets/profile.jpg" alt="Profile" className="avatar" />
+            {accData?.profileURL ? (
+              <img src={accData.profileURL} alt="Avatar" className="avatar" />
+            ) : accData?.avatarURL ? (
+              <img src={accData.avatarURL} alt="Avatar" className="avatar" />
+            ) : (
+              <div className="profile-placeholder">
+                {accData?.accountType === "student" ? "Student Profile" : "Tutor Profile"}
+              </div>
+            )}
           </div>
         </nav>
 

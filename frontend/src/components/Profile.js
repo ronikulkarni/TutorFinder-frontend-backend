@@ -8,6 +8,8 @@ import lockIcon from "../assets/lock.svg";
 import phoneIcon from "../assets/phone.svg";
 import bookIcon from "../assets/book.svg";
 import { Link } from "react-router-dom";
+import { ReactComponent as TrashIcon } from "../assets/trash.svg";
+
 
 const Profile = () => {
   const location = useLocation();
@@ -204,19 +206,33 @@ const Profile = () => {
           </div>
           <br></br><br></br>
       
-          <div><h3>Choose Avatar Picture</h3> </div>
-          <div>
-          <label htmlFor="avatar-input"><img src={personIcon} alt="Avatar" /></label>
-          <input type="file" placeholder="Choose Avatar picture" onChange={(e) => handleFileUpload(e, "avatar")} />
-            {formData.avatar && <img src={formData.avatar} alt="Avatar" width={80} />}
-          </div>
-          <br></br><br></br>
+         
 
           <div><h3>Choose Profile Picture</h3> </div>
           <div>
           <label htmlFor="profilepic-input"><img src={personIcon} alt="PP" /></label>
           <input type="file" placeholder="Choose Profile picture" onChange={(e) => handleFileUpload(e, "profilePic")} />
-          {formData.profilePic && <img src={formData.profilePic} alt="Profile" width={100} />}
+          </div>
+          <div>
+          {formData.profilePic && (
+            <div style={{ display: "flex", alignItems: "center", gap: "80px" }}>
+               <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, profilePic: "" }))}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 0
+                }}
+                title="Remove Profile Picture"
+              >
+                <TrashIcon width={40} height={40} fill="red" />
+              </button>
+              <img src={formData.profilePic} alt="Profile" width={100} />
+             
+            </div>
+            )}
           </div>
           
           <button type="submit">Save Changes</button>
