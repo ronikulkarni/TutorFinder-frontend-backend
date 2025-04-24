@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -39,6 +40,12 @@ public class AccountDAO extends Database {
 	}
 
 	public List<Account> getTutorsForCourse(String courses) {
+		List<Account> accounts = new ArrayList();
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		PreparedStatement courseStmt = null;
+		ResultSet rs = null;
+		ResultSet courseRs = null;
 		try {
 
 			RatingDAO ratingDAO = new RatingDAO();
@@ -64,20 +71,20 @@ public class AccountDAO extends Database {
 			sql.append(") AND AccType = 'tutor'");
 
 			System.out.print(sql);
-			Database db = new Database();
-			PreparedStatement pstmt = db.prepare(sql.toString(), false);
-
+			//Database db = new Database();
+			//PreparedStatement pstmt = db.prepare(sql.toString(), false);
+			conn = new Database().getConnection();
+			pstmt = conn.prepareStatement(sql.toString());
 			// Set the parameters in the PreparedStatement from the coursesToFind array
 			for (int i = 0; i < courseArray.length; i++) {
 				pstmt.setString(i + 1, courseArray[i]);
 			}
 
-			ResultSet rs = pstmt.executeQuery();
+			rs = pstmt.executeQuery();
 			if (rs == null || !rs.next()) {
 				System.err.println("Query failed");
 				return null;
 			}
-			List<Account> accounts = new ArrayList<Account>();
 
 			do {
 
@@ -109,12 +116,12 @@ public class AccountDAO extends Database {
 					}
 					courseQuery.append(")");
 
-					PreparedStatement courseStmt = db.prepare(courseQuery.toString(), false);
+					courseStmt = conn.prepareStatement(courseQuery.toString());
 					for (int i = 0; i < courseIDs.length; i++) {
 						courseStmt.setString(i + 1, courseIDs[i].trim());
 					}
 
-					ResultSet courseRs = courseStmt.executeQuery();
+					courseRs = courseStmt.executeQuery();
 					while (courseRs.next()) {
 						courseNames += courseRs.getString("CourseName") + ", ";
 					}
@@ -132,26 +139,38 @@ public class AccountDAO extends Database {
 			}
 			while (rs.next());
 
-			return accounts;
+			
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		} finally {
+			try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+			try { if (courseRs != null) courseRs.close(); } catch (SQLException e) { e.printStackTrace(); }
+			try { if (courseStmt != null) courseStmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+			try { if (pstmt != null) pstmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+			try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
 		}
+
+		return accounts;
 	}
 	
 
 	public Account getAccount(int id) {
-		Database db = new Database();
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		Account acct = null;
+		
 		try {
-			ResultSet rs = db.getResultSet("SELECT * FROM account WHERE AccountID=" + id);
+			conn = new Database().getConnection();
+			stmt = conn.prepareStatement("SELECT * FROM account WHERE AccountID=?");
+			stmt.setInt(1, id);
+			rs = stmt.executeQuery();
 
-			if (rs == null || !rs.next()) {
-				System.err.println("Query failed");
-				return null;
-			}
-			Account acct = new Account();
+
+			if (rs.next()){
+			acct = new Account();
 
 			acct.setAccountId(rs.getInt("AccountID"));
 			acct.setAccountType(rs.getString("AccType"));
@@ -165,81 +184,67 @@ public class AccountDAO extends Database {
 			acct.setPhoneNumber(rs.getString("PhoneNumber"));
 			acct.setAvatarURL(rs.getString("AvatarURL"));
 			acct.setProfileURL(rs.getString("ProfilePicURL"));
-
-			return acct;
+			}
+			else {
+				System.err.println("Query failed");
+			}
+			
 		}
 		catch (Exception ex) {
-			return null;
+			System.err.println("Error in getAccount: " + ex.getMessage());
+		} finally {
+			try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+			try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+			try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
 		}
+
+		return acct;
 	}
 
 	public Account getAccountByEmail(String emailId) {
-		Database db = new Database();
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		Account acct = null;
+
 		try {
 			System.out.println("getAccountByEmail" + emailId);
-			ResultSet rs = db.getResultSet("SELECT * FROM account WHERE EmaiLID='" + emailId + "'");
+			conn = new Database().getConnection();
+			stmt = conn.prepareStatement("SELECT * FROM account WHERE EmailID=?");
+			stmt.setString(1, emailId);
+			rs = stmt.executeQuery();
+			
+			
+			if (rs.next()) {
+				
+			 	acct = new Account();
 
-			if (rs == null || !rs.next()) {
-				System.err.println("Query failed");
-				return null;
+				acct.setAccountId(rs.getInt("AccountID"));
+				acct.setAccountType(rs.getString("AccType"));
+				acct.setCourse(rs.getString("Course"));
+				acct.setEmailId(rs.getString("EmailID"));
+				acct.setFailedAttempts(rs.getInt("FailedAttempts"));
+				acct.setFirstName(rs.getString("FirstName"));
+				acct.setLastName(rs.getString("lastName"));
+				acct.setLockTime(rs.getString("LockTime"));
+				acct.setMajor(rs.getInt("Major"));
+				acct.setPhoneNumber(rs.getString("PhoneNumber"));
 			}
-			Account acct = new Account();
+			else {
+				System.err.println("Query failed");
+			}
 
-			acct.setAccountId(rs.getInt("AccountID"));
-			acct.setAccountType(rs.getString("AccType"));
-			acct.setCourse(rs.getString("Course"));
-			acct.setEmailId(rs.getString("EmailID"));
-			acct.setFailedAttempts(rs.getInt("FailedAttempts"));
-			acct.setFirstName(rs.getString("FirstName"));
-			acct.setLastName(rs.getString("lastName"));
-			acct.setLockTime(rs.getString("LockTime"));
-			acct.setMajor(rs.getInt("Major"));
-			acct.setPhoneNumber(rs.getString("PhoneNumber"));
 			System.out.println("getAccountByEmail returning" + acct.toString());
-			return acct;
+		}catch (Exception ex) {
+			System.err.println("Error in getAccountByEmail: " + ex.getMessage());
+		}finally {
+			try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+			try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+			try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
 		}
-		catch (Exception ex) {
-			return null;
-		}
+		return acct;
 	}
 
-	/*public Account auth(String email, String pw) {
-		Database db = new Database();
-		try {
-			String hashPW = hashPassword(pw);
-			ResultSet rs = db.query("SELECT * FROM account WHERE EmailID=? AND password=?", email, hashPW);
-
-			if (rs == null || !rs.next()) {
-				System.err.println("Query failed");
-				return null;
-			}
-
-			Account acct = new Account();
-
-			acct.setAccountId(rs.getInt("AccountID"));
-			acct.setAccountType(rs.getString("AccType"));
-			acct.setCourse(rs.getString("Course"));
-			acct.setEmailId(rs.getString("EmailID"));
-			acct.setFailedAttempts(rs.getInt("FailedAttempts"));
-			acct.setFirstName(rs.getString("FirstName"));
-			acct.setLastName(rs.getString("lastName"));
-			acct.setLockTime(rs.getString("LockTime"));
-			acct.setMajor(rs.getInt("Major"));
-			acct.setPhoneNumber(rs.getString("PhoneNumber"));
-			acct.setAvatarURL(rs.getString("AvatarURL"));
-			acct.setProfileURL(rs.getString("ProfilePicURL"));
-
-
-			return acct;
-		}
-		catch (Exception ex) {
-			ex.printStackTrace();
-			return null;
-		}
-		finally {
-		
-		}
-	}*/
 
 	public Account auth(String email, String pw) {
 		Database db = new Database();
@@ -305,6 +310,7 @@ public class AccountDAO extends Database {
 	
 
 	public List<Account> getAccounts() {
+		//
 		Database db = new Database();
 		try {
 			ResultSet rs = db.getResultSet("SELECT * FROM account");

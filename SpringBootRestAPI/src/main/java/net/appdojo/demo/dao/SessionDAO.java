@@ -1,6 +1,9 @@
 package net.appdojo.demo.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,57 +27,60 @@ public class SessionDAO extends Database {
 	}
 
 	public List<Session> getSessions(int acctId, String acctType) {
+
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		List<Session> sessions = null;
 		try {
 			System.out.println("getsessions acctId " + acctId);
-
-			Database db = new Database();
-			// ResultSet rs = db.getResultSet("SELECT * FROM sessions WHERE StudentID= " +
-			// acctId + " order by sessiondate asc, starttime asc");
-			ResultSet rs = null;
-
+			conn = new Database().getConnection();
+			
 			if (acctType.equals("student"))
-				rs = db.getResultSet(
-						"SELECT s.*, CONCAT(t.firstname,' ',  t.lastname) as TutorName, CONCAT(st.firstname,' ',st.lastname) as StudentName, c.coursename FROM sessions s LEFT JOIN account t ON s.TutorID = t.AccountID LEFT JOIN account st ON s.StudentID = st.AccountID LEFT JOIN Course c ON s.CourseID = c.CourseID where StudentID = "
+				stmt = conn.prepareStatement("SELECT s.*, CONCAT(t.firstname,' ',  t.lastname) as TutorName, CONCAT(st.firstname,' ',st.lastname) as StudentName, c.coursename FROM sessions s LEFT JOIN account t ON s.TutorID = t.AccountID LEFT JOIN account st ON s.StudentID = st.AccountID LEFT JOIN Course c ON s.CourseID = c.CourseID where StudentID = "
 								+ acctId + " order by sessiondate asc, starttime asc");
 			else
-				rs = db.getResultSet(
+				stmt = conn.prepareStatement(
 						"SELECT s.*, CONCAT(t.firstname,' ',  t.lastname) as TutorName, CONCAT(st.firstname,' ',st.lastname) as StudentName, c.coursename FROM sessions s LEFT JOIN account t ON s.TutorID = t.AccountID LEFT JOIN account st ON s.StudentID = st.AccountID LEFT JOIN Course c ON s.CourseID = c.CourseID where TutorID = "
 								+ acctId + " order by sessiondate asc, starttime asc");
+			rs = stmt.executeQuery();
 
 			if (rs == null || !rs.next()) {
 				System.err.println("Query failed");
-				return null;
+			}else{
+
+				sessions = new ArrayList<Session>();
+
+				do {
+
+					Session session = new Session();
+					session.setSessionId(rs.getInt("SessionID"));
+					session.setStudentId(rs.getInt("StudentID"));
+					session.setTutorId(rs.getInt("TutorID"));
+					session.setCourseId(rs.getInt("CourseID"));
+					//session.setSessionDate(rs.getDate("SessionDate"));
+					session.setSessionDate(rs.getObject("SessionDate", LocalDate.class));
+					session.setStartTime(rs.getTime("StartTime"));
+					session.setEndTime(rs.getTime("EndTime"));
+					session.setStudentName(rs.getString("StudentName"));
+					session.setTutorName(rs.getString("TutorName"));
+					session.setCourseName(rs.getString("CourseName"));
+					session.setStatus(rs.getString("Status"));
+
+					sessions.add(session);
+				}
+				while (rs.next());
 			}
-
-			List<Session> sessions = new ArrayList<Session>();
-
-			do {
-
-				Session session = new Session();
-				session.setSessionId(rs.getInt("SessionID"));
-				session.setStudentId(rs.getInt("StudentID"));
-				session.setTutorId(rs.getInt("TutorID"));
-				session.setCourseId(rs.getInt("CourseID"));
-				//session.setSessionDate(rs.getDate("SessionDate"));
-				session.setSessionDate(rs.getObject("SessionDate", LocalDate.class));
-				session.setStartTime(rs.getTime("StartTime"));
-				session.setEndTime(rs.getTime("EndTime"));
-				session.setStudentName(rs.getString("StudentName"));
-				session.setTutorName(rs.getString("TutorName"));
-				session.setCourseName(rs.getString("CourseName"));
-				session.setStatus(rs.getString("Status"));
-
-				sessions.add(session);
-			}
-			while (rs.next());
-
-			return sessions;
-
-		}
-		catch (Exception e) {
+	
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
+			System.err.println("Error in getSessions: " + e.getMessage());
+		}finally {
+			try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+			try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+			try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
 		}
+		return sessions;
 	}
 
 	public List<Session> addSession(Session session) {
